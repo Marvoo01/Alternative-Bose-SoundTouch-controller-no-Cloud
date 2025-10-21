@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose Multi-Room Controller - Screenshot Stijl (Aangepast voor WiiM - HTTPS)</title>
+    <style>
+        /* --- ALGEMENE STIJLEN --- */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            background-color: #093340; /* Donkerblauwe achtergrond */
+            color: #ccc;
+        }
+
+        /* --- NIEUWE DASHBOARD CONTAINER (TWEE KOLOMMEN) --- */
+        .main-dashboard {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            background-color: #e1e8eb; /* Lichte achtergrond van de container */
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            min-height: 600px;
+        }
+
+        /* --- LINKERKOLOM: MASTER CONTROLLER (INLOOPKAST) --- */
+        .master-panel-left {
+            width: 50%;
+            padding: 20px;
+            background-color: #e1e8eb; /* Zeer lichte grijze tint voor de linkerhelft */
+            border-radius: 10px 0 0 10px;
+            color: #333;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Zorgt ervoor dat de volume sectie onderaan staat */
+        }
+
+        .master-header h2 {
+            color: #113742;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        
+        .master-status {
+             color: #666;
+             font-size: 14px;
+             padding-bottom: 10px;
+             border-bottom: 1px dashed #ddd;
+             margin-bottom: 15px;
+        }
+        .power-status-display {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin-top: 5px; 
+            display: inline-block;
+        }
+        .power-on { background-color: #d4edda; color: #011208; } 
+        .power-off { background-color: #dc3545; color: white; }
+
+        /* --- PRESET & BRON KNOLLEN STIJL --- */
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .preset-buttons button {
+            width: 32%; /* Breedte voor 3 knoppen naast elkaar */
+            height: 45px; 
+            margin-bottom: 10px;
+            background-color: #a3b3cf;
+            color: #333;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            padding: 0 5px; 
+        }
+        .preset-buttons button:hover { background-color: #007bff; color: white; }
+        
+        /* --- NIEUW: STIJL VOOR ALBUM ART EN TRACK INFO --- */
+        .album-art-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+            margin-bottom: 15px; 
+            background-color: #dbe0e6; 
+            border-radius: 5px;
+            text-align: center;
+            min-height: 140px; 
+        }
+
+        .album-art-section img {
+            max-width: 114px; 
+            max-height: 114px;
+            width: auto;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+
+        .track-info {
+            font-size: 14px;
+            color: #113742;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        .track-info .artist {
+            font-weight: normal;
+            font-size: 13px;
+            display: block; 
+        }
+
+        /* NIEUW: STIJL VOOR DE BOXES IN DE LINKERKOLOM (Master) */
+        .master-control-box {
+            background-color: #e1e8eb; 
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: auto; 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stijl voor Power en Source knoppen (nu in de enkele box) */
+        .master-actions-top-single {
+            display: flex;
+            justify-content: space-between;
+        }
+        .master-actions-top-single button {
+            padding: 15px;
+            border: none;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* Knoppen voor Power en Bron in de Master kolom */
+        .power-button-master { 
+            background-color: #28a745; 
+            color: white; 
+            width: 48%; 
+        }
+        .source-button-master { 
+            background-color: #6c757d; 
+            color: white; 
+            width: 48%; 
+        }
+        
+        /* OUDE RIJ VOOR MULTIROOM EN MUTE/UNMUTE (Niet meer gebruikt, maar bewaard voor context) */
+        .master-button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 5px; 
+        }
+        
+        /* NIEUWE RIJ VOOR MULTIROOM, MUTE/UNMUTE EN STATUS UPDATE */
+        .master-button-row-triple {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 5px; 
+            gap: 5px; /* Voeg een kleine ruimte tussen de knoppen toe */
+        }
+        .master-button-row-triple button {
+            padding: 15px 5px; /* Minder padding voor smallere knoppen */
+            border: none; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: 32%; /* Breedte instellen voor 3 knoppen naast elkaar */
+            font-size: 13px;
+        }
+
+        /* Styling voor de individuele knoppen in de drievoudige rij (kleur behouden) */
+        .multiroom-btn-triple { 
+            background-color: #ffc107; 
+            color: #333; 
+        }
+        .mute-button-triple { 
+            background-color: #ffc107; 
+            color: #333; 
+        }
+        .mute-button-triple.is-muted { 
+            background-color: #dc3545; 
+            color: white; 
+        }
+        .refresh-status-btn-triple { 
+            background-color: #007bff; /* Blauw */
+            color: white; 
+        }
+
+        /* OUDE STIJL VOOR DE REFRESH KNOP (Nu vervangen door .refresh-status-btn-triple) */
+        .refresh-status-btn-master {
+            background-color: #007bff; /* Blauw */
+            color: white; 
+            width: 100%; 
+            padding: 10px 15px; 
+            border: none; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        .refresh-status-btn-master:hover { background-color: #0056b3; }
+
+
+        /* VOLUME CONTROLS */
+        .volume-control-master { 
+            margin-top: 15px; 
+            text-align: left; 
+            padding: 0; 
+            border-top: none; 
+        }
+        .volume-label-master { 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .volume-control-master input[type="range"] { 
+            width: 100%; 
+            margin: 5px 0 10px 0; 
+        }
+        
+        
+        /* --- RECHTERKOLOM: SLAVE VOLUMES --- */
+        .slave-volumes-right {
+            width: 50%;
+            padding: 20px;
+            background-color: #e1e8eb; 
+            border-radius: 0 10px 10px 0;
+            color: #113742;
+            box-sizing: border-box;
+        }
+        .slave-volumes-right h2 {
+            color: #113742;
+            margin-top: 0;
+            border-bottom: 2px solid #a3b3cf;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* --- SLAVE VOLUME CONTROLLER STIJL --- */
+        .volume-control-slave {
+            background-color: #e1e8eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .volume-control-slave h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #113742;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline; 
+            line-height: 1.2;
+        }
+        
+        .volume-control-slave h3 span {
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .slave-source-right {
+            text-align: right;
+            white-space: nowrap; 
+        }
+
+        .volume-label-slave {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .volume-control-slave input[type="range"] {
+            width: 100%;
+            margin: 5px 0 10px 0;
+        }
+        
+        /* NIEUWE STIJL VOOR 3 SLAVE KNOPPEN */
+        .slave-button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .slave-button-row button {
+            padding: 10px 8px; 
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 32%; 
+            font-size: 13px; 
+        }
+        
+        .slave-power-btn { background-color: #28a745; color: white; }
+        .slave-power-btn.is-standby { background-color: #6c757d; }
+        .slave-power-btn.is-standby:hover { background-color: #5a6268; }
+        
+        /* MUTE KNOP (VERKLEIND) */
+        .slave-mute-btn { 
+            background-color: #6c757d; 
+            color: white; 
+        }
+        .slave-mute-btn.is-muted { background-color: #dc3545; color: white; }
+        
+        /* NIEUW: GROEP KNOP STIJL */
+        .slave-group-btn {
+            background-color: #007bff; /* Blauw: Staat los */
+            color: white; 
+        }
+        .slave-group-btn.is-grouped {
+            background-color: #28aa46; /* Groen: Zit in de groep */
+            color: white;
+        }
+
+
+        .status-message-master { 
+             margin-top: 15px; 
+             font-weight: bold; 
+             font-size: 14px; 
+             min-height: 20px; 
+             display: block; 
+             color: green; 
+        }
+
+        /* --- MODAL STYLES (Behouden) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .slave-list label { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            margin-bottom: 10px; 
+            font-size: 16px; 
+            padding: 5px 0;
+            border-bottom: 1px dotted #eee;
+        }
+        .slave-list input[type="checkbox"] {
+            margin-right: 0;
+            width: 20px;
+            height: 20px;
+        }
+        .slave-list .slave-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .slave-status {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        .status-grouped { background-color: #28a745; color: white; }
+        .status-available { background-color: #ffc107; color: #333; }
+        .status-is-slave { background-color: #007bff; color: white; } 
+
+        .modal-buttons button { 
+            margin-top: 15px; 
+            padding: 10px 15px; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .modal-group-btn { background-color: #28a745; color: white; }
+        .modal-ungroup-btn { background-color: #dc3545; color: white; }
+        .modal-status { 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            display: none; 
+            font-size: 14px;
+        }
+        .modal-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .modal-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-dashboard" id="mainDashboard">
+        </div>
+
+    <div id="multiroomModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Multi-room Instellingen</h3>
+            <p>Master: <strong><span id="modalMasterName"></span></strong></p>
+            <p style="font-size: 14px; color: #666;">Selecteer de **Slaves** om te groeperen of te verwijderen:</p>
+            
+            <div class="slave-list" id="modalSlaveCheckboxes">
+                </div>
+
+            <div class="modal-buttons">
+                <button class="modal-group-btn" onclick="groupSpeakers()">GROEP MAKEN / WIJZIGEN</button>
+                <button class="modal-ungroup-btn" onclick="ungroupSelectedSlaves()">SLAVES VERWIJDEREN</button>
+            </div>
+            
+            <div id="modalStatus" class="modal-status"></div>
+        </div>
+    </div>
+
+    <script>
+    // Globale Status Variabele
+    let statusTimer = null; // Timer voor de automatische, periodieke updates
+    let knopTimer = null; // Aparte timer voor de handmatige knopfunctie
+    
+    // Configuratie constanten
+    const BOSE_PORT = 8090;
+    const SENDER_NAME = "Gabbo"; 
+    const STATUS_TIMEOUT_MS = 5000; 
+    const POLLING_INTERVAL_MS = 2000; // Sneller polling interval (2 seconden)
+
+    
+    // --- CONSTANTEN VOOR DE LAY-OUT STIJL VAN DE SCREENSHOT ---
+    const MASTER_SPEAKER_NAME = 'Inloopkast';
+    const SLAVE_SPEAKERS_ORDER = ['Woonkamer', 'Keuken', 'Achtertuin', 'Garage', 'Hobbyzolder'];
+    // --- EINDE CONSTANTEN ---
+
+    // --- VOLLEDIGE SPEAKER DATA (GEBRUIKT DE BESTAANDE) ---
+    const FULL_SPEAKER_DATA = {
+        'Woonkamer': { ip: '192.168.1.50', mac: '50:F1:4A:6D:7F:10', id: '985DAD2E2A87', model: 'ST300' },
+        'Keuken': { ip: '192.168.1.51', mac: 'F0:45:DA:E8:01:52', id: '587A627721B0', model: 'ST20' },
+        'Achtertuin': { ip: '192.168.1.53', mac: '74:DA:EA:C2:F2:AE', id: '68C90B401F23', model: 'ST10' },
+        'Garage': { ip: '192.168.1.54', mac: '00:0C:8A:B3:83:DC', id: '000C8AB383D7', model: 'ST20' },
+        'Hobbyzolder': { ip: '192.168.1.55', mac: 'A8:1B:6A:92:54:F0', id: '38D26970662E', model: 'ST20' },
+        'Inloopkast': { ip: '192.168.1.52', mac: '74:DA:EA:F6:20:AE', id: 'EC24B8861023', model: 'ST10' }
+    };
+
+    const SPEAKERS = Object.keys(FULL_SPEAKER_DATA).reduce((acc, name) => {
+        acc[name] = FULL_SPEAKER_DATA[name].ip;
+        return acc;
+    }, {});
+    
+    const SPEAKER_KEYS = Object.keys(FULL_SPEAKER_DATA);
+    let SPEAKER_PRESETS = {}; 
+    let SPEAKER_CURRENT_SOURCE_TEXTS = {}; // Cache voor de brontekst
+    let currentMaster = null; 
+    let currentGroupStatus = {}; 
+    
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // --- WIIIM PRESET & METADATA FUNCTIES ---
+    const WIIM_IP = '192.168.1.109'; 
+    
+    // Cache voor de WiiM Preset namen (1 t/m 12)
+    let WIIM_PRESET_NAMES = {}; 
+    
+    function callWiiMPreset(presetNumber) {
+        // AANGEPAST VOOR PRESET 1 T/M 12
+        if (presetNumber < 1 || presetNumber > 12) { 
+            console.error('Ongeldig presetnummer. Gebruik een nummer van 1 tot 12.');
+            return;
+        }
+
+        const apiCommand = `MCUKeyShortClick:${presetNumber}`;
+        // Commando voor het afspelen van een preset is correct
+        const url = `https://${WIIM_IP}/httpapi.asp?command=${apiCommand}`;
+
+        console.log(`WiiM Preset ${presetNumber} oproepen: ${url}`);
+
+        fetch(url)
+            .then(response => {
+                if (response.ok || response.type === 'opaque') {
+                    console.log(`WiiM Preset ${presetNumber} succesvol aangeroepen.`);
+                } else {
+                    console.error(`Fout bij oproepen van WiiM API voor Preset ${presetNumber}. Status: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                console.error(`Netwerkfout bij oproepen van WiiM API voor Preset ${presetNumber}:`, error);
+                console.warn("Mogelijk veroorzaakt door onbekend HTTPS-certificaat. Controleer of je de beveiligingswaarschuwing hebt genegeerd.");
+            });
+    }
+    
+    // Functie om de preset namen op te halen van de WiiM (gebruikt getPresetInfo en JSON)
+    async function fetchWiiMPresetNames() {
+        const url = `https://${WIIM_IP}/httpapi.asp?command=getPresetInfo`; 
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json(); 
+            
+            const newPresetNames = {};
+            if (data.preset_list && Array.isArray(data.preset_list)) { 
+                data.preset_list.forEach(item => {
+                    const index = parseInt(item.number, 10);
+                    let presetName = item.name ? item.name.trim() : `WiiM Preset ${index}`;
+                    
+                    if (index >= 1 && index <= 12) { // Uitgebreid naar 12
+                         newPresetNames[index] = presetName;
+                    }
+                });
+            } else {
+                 console.warn("WiiM API gaf geen geldige preset_list terug.");
+            }
+            
+            WIIM_PRESET_NAMES = newPresetNames;
+            updateWiiMPresetButtons();
+            
+        } catch (error) {
+            console.error("Fout bij ophalen WiiM presets:", error);
+        }
+    }
+    
+    // NIEUW: Functie om album art en metadata op te halen van de WiiM
+    async function fetchWiiMAlbumArtAndInfo() {
+        // Commando naar 'getMetaInfo' volgens documentatie (2.9)
+        const url = `https://${WIIM_IP}/httpapi.asp?command=getMetaInfo`; 
+        
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json(); 
+            
+            const meta = data.metaData;
+            // Zoek naar de albumArtURI, rekening houdend met mogelijke spatie in de key van de API-respons
+            const albumArtURI = meta ? (meta["albumArtURI "] || meta.albumArtURI || meta.albumarturi) : null; 
+            const title = meta ? (meta.title || 'Geen Titel') : 'Geen Metadata';
+            const artist = meta ? (meta.artist || '') : '';
+            
+            const artElement = document.getElementById('wiimAlbumArt');
+            const titleElement = document.getElementById('wiimTrackTitle');
+            const artistElement = document.getElementById('wiimTrackArtist');
+            
+            if (albumArtURI && albumArtURI !== 'null' && albumArtURI !== '') {
+                artElement.src = albumArtURI;
+                artElement.style.display = 'block';
+            } else {
+                // Verberg de afbeelding als er geen art is
+                artElement.style.display = 'none';
+                artElement.src = '';
+            }
+
+            // Toon de track info
+            titleElement.textContent = title;
+            artistElement.textContent = artist ? `door ${artist}` : '';
+            
+        } catch (error) {
+            console.error("Fout bij ophalen WiiM metadata (controleer HTTPS/certificaat of API response):", error);
+            
+            // Bij fout, toon een duidelijke melding
+            document.getElementById('wiimTrackTitle').textContent = 'Fout: Metadata niet bereikbaar.';
+            document.getElementById('wiimTrackArtist').textContent = 'Check HTTPS/certificaat.';
+            document.getElementById('wiimAlbumArt').style.display = 'none';
+            document.getElementById('wiimAlbumArt').src = '';
+        }
+    }
+    
+    // Functie om de knopteksten bij te werken
+    function updateWiiMPresetButtons() {
+        for (let i = 1; i <= 12; i++) { // Uitgebreid naar 12
+            const button = document.querySelector(`.preset-buttons button[data-preset-num="${i}"]`);
+            if (button) {
+                const presetName = WIIM_PRESET_NAMES[i] || `WiiM Preset ${i}`;
+                button.textContent = presetName;
+            }
+        }
+    }
+    // --- EINDE WIIIM PRESET & METADATA FUNCTIES ---
+
+
+    // --- HULP & STATUS FUNCTIES ---
+
+    /** Hulpfunctie om de POST request te versturen naar een endpoint (voor COMMANDO'S). */
+    function sendCommand(endpoint, xmlBody, name) {
+         const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+
+         return fetch(endpoint, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/xml' },
+             body: xmlBody,
+             mode: 'no-cors' 
+         }).then(response => {
+             if (response.ok || response.status === 200 || response.type === 'opaque') {
+                 return response;
+             } else {
+                 throw new Error(`HTTP status ${response.status}`);
+             }
+         }).catch(error => {
+             if (error.message.includes('fetch') && statusDiv) {
+                 statusDiv.style.color = 'red';
+                 statusDiv.textContent = `? Fout bij communicatie met ${name}. Zorg dat de speaker AAN staat.`;
+                 console.error(`Fout bij ${name}:`, error);
+             }
+             throw error; 
+         });
+    }
+
+    /** Zendt een GET request naar een endpoint en parset de XML (voor STATUS). */
+    async function fetchStatus(ip, name, endpointSuffix, timeout = STATUS_TIMEOUT_MS) {
+        // Bose gebruikt altijd HTTP
+        const endpoint = `http://${ip}:${BOSE_PORT}${endpointSuffix}`; 
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            const response = await fetch(endpoint, { 
+                method: 'GET', 
+                headers: { 'Content-Type': 'application/xml' },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId); 
+            
+            if (!response.ok) {
+                throw new Error(`HTTP status ${response.status}`);
+            }
+            const text = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "application/xml");
+            
+            return { xmlDoc: xmlDoc, isOnline: true };
+
+        } catch (error) {
+            clearTimeout(timeoutId);
+            // Als de fetch faalt (timeout, geen verbinding, etc.) is de speaker offline.
+            return { xmlDoc: null, isOnline: false };
+        }
+    }
+    
+    /** Status update helper voor alle commando's (Hoofdcontroller) */
+    function updateStatus(name, action, success) {
+        const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+        if (!statusDiv) return;
+
+        if (success) {
+            statusDiv.style.color = 'green';
+            statusDiv.textContent = `? ${name}: ${action} succesvol.`;
+        } else {
+            statusDiv.style.color = 'red';
+            statusDiv.textContent = `? ${name}: Fout bij ${action}.`;
+        }
+        
+        // Verberg de status na 5 seconden
+        // We gebruiken een lokale timer (setTimeout) om de melding na 5s te verwijderen.
+        setTimeout(() => { 
+             if (statusDiv.textContent.startsWith('?')) {
+                 statusDiv.textContent = ''; // Maak schoon
+             }
+        }, 5000);
+    }
+
+    /** Toont statusmeldingen in het modale venster (Multi-room) */
+    function showModalStatus(message, isError = false) {
+        const statusDiv = document.getElementById('modalStatus');
+        statusDiv.textContent = message;
+        statusDiv.className = isError ? 'modal-status modal-error' : 'modal-status modal-success';
+        statusDiv.style.display = 'block';
+        setTimeout(() => statusDiv.style.display = 'none', 7000);
+    }
+
+    /** Werkt de Powerstatus (AAN/UIT) in de header EN de Slave Power Knoppen bij. */
+    function updatePowerStatusDisplay(isOnline, name) {
+        const isMaster = name === MASTER_SPEAKER_NAME;
+        const sourceText = SPEAKER_CURRENT_SOURCE_TEXTS[name] || 'AUX'; 
+        
+        // --- Master UI Elementen ---
+        const masterPowerStatus = document.getElementById('masterPowerStatus');
+        const masterMuteButton = document.getElementById(`muteButton-${MASTER_SPEAKER_NAME}`);
+
+
+        // --- Slave UI Elementen ---
+        const slavePowerButton = document.getElementById(`powerButton-${name}`);
+        const slaveMuteButton = document.getElementById(`muteButton-${name}`);
+
+
+        if (isMaster) {
+            if (masterPowerStatus) {
+                if (isOnline) {
+                    masterPowerStatus.textContent = 'Online';
+                    masterPowerStatus.className = 'power-status-display power-on';
+                } else {
+                    masterPowerStatus.textContent = 'Standby';
+                    masterPowerStatus.className = 'power-status-display power-off';
+                    
+                    if (masterMuteButton) masterMuteButton.classList.remove('is-muted');
+                }
+            }
+        } 
+        
+        // SLAVE UI UPDATE (voor alle slaves)
+        if (!isMaster && slavePowerButton) {
+            if (isOnline) {
+                slavePowerButton.classList.remove('is-standby');
+            } else {
+                slavePowerButton.classList.add('is-standby');
+                if (slaveMuteButton) slaveMuteButton.classList.remove('is-muted');
+            }
+        }
+    }
+    
+    /** Werkt de Groepsknop (SLAVE) in de rechterkolom bij */
+    function updateGroupButtonUI(name) {
+        const statusData = currentGroupStatus[name];
+        const groupButton = document.getElementById(`groupButton-${name}`);
+        const masterName = MASTER_SPEAKER_NAME;
+        
+        if (!groupButton) return;
+
+        // Controleer of de speaker een slave is van de Inloopkast (MASTER_SPEAKER_NAME)
+        const isGroupedWithMaster = statusData.status === 'SLAVE' && statusData.masterName === masterName;
+        
+        // Controleer of de speaker zelf Master of Slave is van een *andere* groep
+        const isUnavailable = (statusData.status === 'MASTER' && statusData.masterName !== masterName) || 
+                              (statusData.status === 'SLAVE' && statusData.masterName !== masterName);
+
+        groupButton.classList.toggle('is-grouped', isGroupedWithMaster);
+        
+        if (isGroupedWithMaster) {
+            groupButton.textContent = 'Groep (AAN)';
+            groupButton.disabled = false;
+        } else if (isUnavailable) {
+            groupButton.textContent = 'Bezet';
+            groupButton.disabled = true; // Kan niet toegevoegd/verwijderd worden
+        } else { // VRIJ
+            groupButton.textContent = 'Groep (UIT)';
+            groupButton.disabled = false;
+        }
+    }
+
+
+    // --- STATUS OPHALEN & UPDATEN ---
+
+    async function fetchZone(ip, name) { 
+        const result = await fetchStatus(ip, name, '/getZone', STATUS_TIMEOUT_MS); 
+        if (!result.xmlDoc) return []; 
+        
+        try {
+            const zoneElement = result.xmlDoc.querySelector('zone');
+            if (!zoneElement) return []; 
+            const masterId = zoneElement.getAttribute('master');
+            const members = result.xmlDoc.querySelectorAll('member');
+            const groupMembers = [];
+            members.forEach(member => {
+                const memberId = member.textContent;
+                const memberName = Object.keys(FULL_SPEAKER_DATA).find(key => FULL_SPEAKER_DATA[key].id === memberId);
+                if (memberName) {
+                    groupMembers.push({
+                        name: memberName,
+                        id: memberId,
+                        isMaster: memberId === masterId
+                    });
+                }
+            });
+            return groupMembers;
+        } catch (e) {
+            console.error("Fout bij parsen zone XML:", e);
+            return [];
+        }
+    }
+    
+    async function fetchGroupStatusForAll() {
+        currentGroupStatus = {};
+        const promises = [];
+        for (const name of SPEAKER_KEYS) {
+            const data = FULL_SPEAKER_DATA[name];
+            promises.push(fetchZone(data.ip, name)); 
+        }
+        const allZones = await Promise.all(promises);
+        for (let i = 0; i < SPEAKER_KEYS.length; i++) {
+            const name = SPEAKER_KEYS[i];
+            const zone = allZones[i];
+            if (zone && zone.length > 1) { 
+                const master = zone.find(m => m.isMaster);
+                if (master) {
+                    currentGroupStatus[master.name] = { status: 'MASTER', masterName: master.name };
+                    zone.filter(m => !m.isMaster).forEach(slave => {
+                        if (!currentGroupStatus[slave.name] || currentGroupStatus[slave.name].status !== 'MASTER') {
+                            currentGroupStatus[slave.name] = { status: 'SLAVE', masterName: master.name };
+                        }
+                    });
+                }
+            }
+        }
+        for (const name of SPEAKER_KEYS) {
+             if (!currentGroupStatus[name]) {
+                currentGroupStatus[name] = { status: 'VRIJ', masterName: null };
+             }
+        }
+        
+        // NIEUW: Werk de UI knoppen bij voor alle slaves
+        for (const name of SLAVE_SPEAKERS_ORDER) {
+             updateGroupButtonUI(name);
+        }
+    }
+    
+    /**
+     * Deze functie haalt de source op voor ALLE speakers, 
+     * en werkt de Master & Slave UI bij. De status wordt gecached.
+     */
+    async function fetchNowPlayingAndSource(ip, name) {
+        const nowPlayingResult = await fetchStatus(ip, name, '/nowPlaying');
+        
+        const isMaster = (name === MASTER_SPEAKER_NAME);
+        const masterDisplayElement = isMaster ? document.getElementById('masterCurrentSourceDisplay') : null; 
+        // Element voor Slave Bron Status
+        const slaveDisplayElement = !isMaster ? document.getElementById(`slaveCurrentSourceDisplay-${name}`) : null;
+        
+        if (!nowPlayingResult.isOnline || !nowPlayingResult.xmlDoc) {
+            const offlineText = 'Standby';
+            if (isMaster && masterDisplayElement) masterDisplayElement.textContent = `${offlineText}`; 
+            if (slaveDisplayElement) slaveDisplayElement.textContent = offlineText; 
+            
+            SPEAKER_CURRENT_SOURCE_TEXTS[name] = offlineText; // Cache de status
+            return;
+        }
+
+        try {
+            const sourceElement = nowPlayingResult.xmlDoc.querySelector('nowPlaying');
+            const stationNameElement = nowPlayingResult.xmlDoc.querySelector('stationName');
+            const itemNameElement = nowPlayingResult.xmlDoc.querySelector('ContentItem itemName'); 
+            
+            let sourceCacheText = 'ONBEKEND';
+
+            if (sourceElement) {
+                const source = sourceElement.getAttribute('source');
+
+                if (source === 'STANDBY') {
+                    sourceCacheText = 'Standby';
+                } else if (source === 'TUNEIN' || source === 'SPOTIFY' || source === 'DEEZER') {
+                    if (stationNameElement && stationNameElement.textContent) {
+                        sourceCacheText = stationNameElement.textContent;
+                    } else if (itemNameElement && itemNameElement.textContent) {
+                        sourceCacheText = itemNameElement.textContent;
+                    } else {
+                        sourceCacheText = source.toUpperCase();
+                    }
+                } else if (source === 'AUX_INPUT') {
+                    sourceCacheText = 'AUX'; 
+                } else if (source === 'PRODUCT' || source === 'TV' || source === 'HDMI_1') {
+                    sourceCacheText = 'TV/HDMI';
+                } else {
+                    sourceCacheText = source;
+                }
+            }
+            
+            // Cache de status
+            SPEAKER_CURRENT_SOURCE_TEXTS[name] = sourceCacheText; 
+
+            // UI Updates
+            if (isMaster && masterDisplayElement) {
+                masterDisplayElement.textContent = `${sourceCacheText}`;
+            }
+            // Slave UI Update
+            if (!isMaster && slaveDisplayElement) {
+                slaveDisplayElement.textContent = sourceCacheText;
+            }
+
+        } catch (e) {
+            console.error(`Fout bij parsen nowPlaying XML voor ${name}:`, e);
+            SPEAKER_CURRENT_SOURCE_TEXTS[name] = 'Fout bij bron ophalen';
+            if (isMaster && masterDisplayElement) {
+                masterDisplayElement.textContent = 'ONBEKEND';
+            }
+            if (!isMaster && slaveDisplayElement) {
+                slaveDisplayElement.textContent = 'ONBEKEND';
+            }
+        }
+    }
+    
+    /**
+     * Haalt Power, Mute en HUIDIGE Volume status op en werkt de UI bij.
+     */
+    async function fetchPowerAndMuteStatus(ip, name) {
+        
+        const volumeResult = await fetchStatus(ip, name, '/volume'); 
+        
+        // De powerstatus is nu afhankelijk van of de /volume fetch succesvol was
+        updatePowerStatusDisplay(volumeResult.isOnline, name); 
+        
+        if (!volumeResult.isOnline || !volumeResult.xmlDoc) {
+            return;
+        }
+        
+        let currentVolume = null;
+        let isMuted = false;
+
+        try {
+            const rootVolumeElement = volumeResult.xmlDoc.querySelector('volume'); 
+            
+            if (rootVolumeElement) {
+                
+                // --- VOLUME STATUS LEZEN ---
+                const actualVolumeElement = rootVolumeElement.querySelector('actualvolume'); 
+                if (actualVolumeElement && actualVolumeElement.textContent) {
+                    currentVolume = parseInt(actualVolumeElement.textContent, 10);
+                } 
+                else if (rootVolumeElement.getAttribute('volume')) {
+                    currentVolume = parseInt(rootVolumeElement.getAttribute('volume'), 10);
+                }
+
+                // --- MUTE STATUS LEZEN ---
+                const muteAttr = rootVolumeElement.getAttribute('mute');
+                if (muteAttr !== null) {
+                     isMuted = muteAttr.toLowerCase() === 'true';
+                } 
+                else {
+                     const muteEnabledElement = rootVolumeElement.querySelector('muteenabled');
+                     if (muteEnabledElement) {
+                        isMuted = muteEnabledElement.textContent.toLowerCase() === 'true';
+                     }
+                }
+
+
+                // --- UI UPDATE: SLIDER & LABEL ---
+                const volumeSlider = document.getElementById(`volumeSlider-${name}`);
+                const volumeLabel = document.getElementById(`volumeLabel-${name}`); 
+                
+                if (currentVolume !== null) {
+                     const newSliderValue = parseInt(currentVolume, 10);
+                     
+                     // Zorg ervoor dat de slider value wordt bijgewerkt, tenzij de gebruiker aan het slepen is.
+                     if (volumeSlider && document.activeElement !== volumeSlider) {
+                          volumeSlider.value = newSliderValue; 
+                     }
+                     
+                     // De label wordt altijd bijgewerkt met de API-waarde.
+                     if (volumeLabel) {
+                        volumeLabel.textContent = newSliderValue; 
+                     }
+                } else if (volumeLabel) {
+                     // Default waarde instellen als er geen volume is, maar de speaker is aan
+                     volumeLabel.textContent = '0';
+                     if (volumeSlider && document.activeElement !== volumeSlider) {
+                         volumeSlider.value = '0'; 
+                     }
+                }
+                
+                // UI UPDATE: Mute Button
+                const muteButton = document.getElementById(`muteButton-${name}`);
+
+                if (muteButton) {
+                    muteButton.classList.toggle('is-muted', isMuted);
+                    muteButton.textContent = isMuted ? 'UNMUTE' : 'MUTE';
+                }
+            } 
+        } catch (e) {
+            console.error(`Fout bij parsen Volume/Mute XML voor ${name}:`, e);
+        }
+    }
+    
+    /** Roept alle status-update functies aan voor EEN enkele speaker. */
+    function updateSpeakerStatus(name) {
+        const ip = SPEAKERS[name];
+        
+        // Volgorde aangepast voor meer stabiliteit: eerst Power/Volume, dan Bron.
+        fetchPowerAndMuteStatus(ip, name) 
+        .then(() => {
+             fetchNowPlayingAndSource(ip, name);
+        });
+    }
+    
+    /**
+     * Voert de volledige status-update cyclus uit zonder UI statusberichten te tonen. 
+     * Gebruikt voor automatische polling.
+     */
+    function periodicFullStatusUpdate() {
+        // 1. Bose Speaker Status (Power, Mute, Volume, Bron)
+        SPEAKER_KEYS.forEach(name => updateSpeakerStatus(name));
+        
+        // 2. Bose Groepsstatus (voor de knopkleuren)
+        fetchGroupStatusForAll(); 
+        
+        // 3. WiiM Presets en Metadata
+        fetchWiiMPresetNames();
+        fetchWiiMAlbumArtAndInfo();
+    }
+    
+    /**
+     * Roept alle status-update functies onmiddellijk aan om de UI te synchroniseren.
+     * Dit is de functie achter de 'Forceer Status Update' knop, INCLUSIEF de visuele statusmelding.
+     */
+    function forceFullStatusUpdate() {
+        const masterStatusDiv = document.getElementById(`statusMessage-${MASTER_SPEAKER_NAME}`);
+        if (masterStatusDiv) {
+            masterStatusDiv.style.color = 'yellow';
+            masterStatusDiv.textContent = `Bezig met handmatige status updates voor alle speakers en WiiM...`;
+        }
+
+        // Roep de stille update functie aan
+        periodicFullStatusUpdate();
+        
+        // Zet een statusmelding
+        setTimeout(() => {
+             if (masterStatusDiv) {
+                 masterStatusDiv.style.color = 'green';
+                 masterStatusDiv.textContent = `Handmatige status update voltooid.`;
+             }
+        }, 500); 
+        
+        setTimeout(() => {
+             if (masterStatusDiv && masterStatusDiv.textContent === `Handmatige status update voltooid.`) {
+                 masterStatusDiv.textContent = ''; // Maak schoon na 3 seconden
+             }
+        }, 3500);
+    }
+
+    /**
+     * START en STOP de polling timer voor ALLE speakers EN de WiiM presets/metadata. 
+     */
+    function managePolling(start) {
+        // Stop de bestaande timers
+        if (statusTimer) {
+            clearInterval(statusTimer);
+            statusTimer = null;
+        }
+        if (knopTimer) {
+             clearInterval(knopTimer);
+             knopTimer = null;
+        }
+        
+        if (start) {
+            // 1. Eerste directe update bij het starten (gebruik de knop-functie)
+            forceFullStatusUpdate();
+            
+            // 2. Start de NIEUWE timer die de knop-functie elke 2 seconden aanroept
+            knopTimer = setInterval(() => {
+                forceFullStatusUpdate();
+            }, POLLING_INTERVAL_MS); 
+        }
+    }
+
+    // --- UI GENERATIE FUNCTIES ---
+
+    /** Genereert de HTML voor de Master (Inloopkast) aan de linkerkant. */
+    function createMasterPanelHTML() {
+        const name = MASTER_SPEAKER_NAME;
+        const data = FULL_SPEAKER_DATA[name];
+        const ip = data.ip;
+
+        // Genereer Presets (Vaste WiiM presets)
+        let presetButtonsHtml = '';
+        // Loop van 1 tot en met 12 voor de 3x4 layout
+        for (let i = 1; i <= 12; i++) {
+            const buttonText = WIIM_PRESET_NAMES[i] || `WiiM Preset ${i} (Laden)`; 
+            
+            presetButtonsHtml += `<button data-preset-num="${i}" onclick="callWiiMPreset(${i})">${buttonText}</button>`;
+        }
+        
+        return `
+            <div class="master-panel-left">
+                <div>
+                    <div class="master-header">
+                        <h2>${name}</h2>
+                        <span id="masterPowerStatus" class="power-status-display">Laden...</span>
+                    </div>
+                    
+                    <div class="master-status">
+                        IP: ${ip} | Model: ${data.model} | Bron: <span id="masterCurrentSourceDisplay">Laden bron...</span>
+                    </div>
+
+                    <div class="preset-buttons">
+                        ${presetButtonsHtml}
+                    </div>
+                    
+                    <div class="album-art-section">
+                        <img id="wiimAlbumArt" src="" alt="Album Art" style="display:none;">
+                        <div class="track-info">
+                            <span id="wiimTrackTitle">Geen info geladen</span>
+                            <span id="wiimTrackArtist" class="artist">Bezig met ophalen...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="master-control-box">
+                        
+                        <div class="master-actions-top-single">
+                            <button id="masterPowerButton" class="power-button-master" onclick="togglePower('${ip}', '${name}')">
+                                Aan/Uit
+                            </button>
+                            <button class="source-button-master" onclick="sendSourceKeyCyclicFixed('${ip}', '${name}', 'AUX_INPUT', 1)">
+                                BRON (AUX)
+                            </button>
+                        </div>
+                        
+                        <hr style="border: 0; border-top: 1px solid #c1c9d6; margin: 15px 0;">
+                        
+                        <div class="master-button-row-triple">
+                            <button class="multiroom-btn-triple" onclick="openModal('${name}')">
+                                MULTI-ROOM
+                            </button>
+                            <button class="mute-button-triple" id="muteButton-${name}" onclick="sendMuteToggle('${ip}', '${name}')">
+                                MUTE
+                            </button>
+                            <button class="refresh-status-btn-triple" onclick="forceFullStatusUpdate()">
+                                STATUS UPDATE
+                            </button>
+                        </div>
+
+                        <div class="volume-control-master">
+                            <div class="volume-label-master">
+                                <span>Volume ${name}:</span><span id="volumeLabel-${name}">0</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="0" id="volumeSlider-${name}" oninput="updateVolumeLabel('${name}', this.value)" onchange="sendVolume('${ip}', '${name}', this.value)">
+                        </div>
+                        
+                        <span id="statusMessage-master" class="status-message-master"></span>
+                    </div>
+                    </div>
+            </div>
+        `;
+    }
+    
+    /** Genereert de HTML voor de Slave Volumes aan de rechterkant. */
+    function createSlaveVolumeHTML() {
+        let slaveHtml = '<h2>Volumes en Power van Gekoppelde Speakers:</h2>';
+        
+        SLAVE_SPEAKERS_ORDER.forEach(name => {
+            const data = FULL_SPEAKER_DATA[name];
+            const ip = data.ip;
+            
+            // AANGEPAST: De h3-titel gebruikt Flexbox om de bron rechts uit te lijnen
+            slaveHtml += `
+                <div class="volume-control-slave">
+                    <h3>
+                        <span class="slave-volume-left">
+                            <span style="font-size: 16px;">Volume ${name}: </span>
+                            <span id="volumeLabel-${name}" style="font-weight: bold;">0</span>
+                        </span>
+                        <span class="slave-source-right">
+                            Bron: <span id="slaveCurrentSourceDisplay-${name}" style="font-weight: normal; font-size: 14px; color: #666;">Laden...</span>
+                        </span>
+                    </h3>
+                    <input type="range" min="0" max="100" value="0" id="volumeSlider-${name}" oninput="updateVolumeLabel('${name}', this.value)" onchange="sendVolume('${ip}', '${name}', this.value)">
+                    
+                    <div class="slave-button-row">
+                         <button class="slave-power-btn" id="powerButton-${name}" onclick="togglePower('${ip}', '${name}')">
+                            Aan/Uit
+                         </button>
+                         <button class="slave-group-btn" id="groupButton-${name}" 
+                            onclick="toggleGroupSlave('${name}')">
+                            Groep (UIT)
+                         </button>
+                         <button class="slave-mute-btn" id="muteButton-${name}" onclick="sendMuteToggle('${ip}', '${name}')">
+                            MUTE
+                         </button>
+                    </div>
+                    <span id="statusMessage-${name}"></span>
+                </div>
+            `;
+        });
+        
+        return `<div class="slave-volumes-right">${slaveHtml}</div>`;
+    }
+
+    /** Laadt de twee-koloms lay-out. */
+    function generateTwoColumnLayout() {
+        const dashboard = document.getElementById('mainDashboard');
+        if (!dashboard) return;
+        
+        const masterPanel = createMasterPanelHTML();
+        const slavePanel = createSlaveVolumeHTML();
+        
+        dashboard.innerHTML = masterPanel + slavePanel;
+
+        // Start polling voor alle speakers en WiiM presets
+        managePolling(true);
+    }
+
+    // --- MODAL FUNCTIES (Aangepast) ---
+    async function openModal(masterName) { 
+        currentMaster = masterName;
+        document.getElementById('modalMasterName').textContent = masterName;
+        document.getElementById('multiroomModal').style.display = 'block';
+        document.getElementById('modalStatus').style.display = 'none';
+
+        showModalStatus('Bezig met status ophalen van alle speakers voor Multi-room...');
+        await fetchGroupStatusForAll(); 
+
+        const slaveCheckboxesDiv = document.getElementById('modalSlaveCheckboxes');
+        slaveCheckboxesDiv.innerHTML = '';
+        
+        for (const name in FULL_SPEAKER_DATA) {
+            if (name !== masterName) {
+                const data = FULL_SPEAKER_DATA[name];
+                const statusData = currentGroupStatus[name];
+
+                let isGrouped = false;
+                let isDisabled = false;
+                let statusClass = 'status-available';
+                let statusText = 'Beschikbaar';
+
+                if (statusData.status === 'SLAVE' && statusData.masterName === masterName) {
+                    isGrouped = true;
+                    statusClass = 'status-grouped';
+                    statusText = 'IN GROEP';
+                } else if (statusData.status === 'SLAVE' || statusData.status === 'MASTER') {
+                    isDisabled = true; 
+                    statusClass = 'status-is-slave';
+                    statusText = (statusData.status === 'MASTER' ? 'ANDERE MASTER' : `SLAVE VAN ${statusData.masterName.toUpperCase()}`);
+                }
+
+                const checkedAttribute = isGrouped ? 'checked' : '';
+                const disabledAttribute = isDisabled ? 'disabled' : '';
+
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <span class="slave-info">${name} 
+                        <span class="slave-status ${statusClass}">${statusText}</span>
+                    </span>
+                    <input type="checkbox" name="slave" value="${name}" data-id="${data.id}" data-ip="${data.ip}" ${checkedAttribute} ${disabledAttribute}>
+                `;
+                slaveCheckboxesDiv.appendChild(label);
+            }
+        }
+        showModalStatus('Klaar met status ophalen.');
+    }
+
+    function closeModal() {
+        document.getElementById('multiroomModal').style.display = 'none';
+        currentMaster = null;
+    }
+
+    function groupSpeakers() {
+        if (!currentMaster) {
+            showModalStatus('? Fout: Geen Master geselecteerd!', true);
+            return;
+        }
+
+        const master = FULL_SPEAKER_DATA[currentMaster];
+        const selectedSlaves = [];
+        const checkboxes = document.querySelectorAll('#modalSlaveCheckboxes input[type="checkbox"]:checked:not(:disabled)');
+
+        checkboxes.forEach(cb => {
+            selectedSlaves.push({ name: cb.value, id: cb.dataset.id, ip: cb.dataset.ip });
+        });
+
+        let xml = `<zone master="${master.id}">`;
+        xml += `<member ipaddress="${master.ip}">${master.id}</member>`;
+        selectedSlaves.forEach(slave => {
+            xml += `<member ipaddress="${slave.ip}">${slave.id}</member>`;
+        });
+        xml += `</zone>`;
+
+        showModalStatus(`Bezig met groeperen met ${selectedSlaves.length} slave(s)...`);
+        
+        sendCommand(`http://${master.ip}:${BOSE_PORT}/setZone`, xml, master.name || 'Master')
+        .then(() => {
+            showModalStatus(`? Groep succesvol aangemaakt/gewijzigd.`, false);
+            openModal(currentMaster); 
+        })
+        .catch(error => {
+            showModalStatus(`? Fout bij groeperen. Controleer of de Master aanstaat.`, true);
+            console.error('Groeperingsfout:', error);
+        });
+    }
+
+    async function ungroupSelectedSlaves() {
+        if (!currentMaster) {
+            showModalStatus('? Fout: Geen Master geselecteerd!', true);
+            return;
+        }
+
+        const master = FULL_SPEAKER_DATA[currentMaster];
+        const slavesToRemove = [];
+        const checkboxes = document.querySelectorAll('#modalSlaveCheckboxes input[type="checkbox"]:checked');
+
+        checkboxes.forEach(cb => {
+            const slaveName = cb.value;
+            if (currentGroupStatus[slaveName] && currentGroupStatus[slaveName].status === 'SLAVE' && currentGroupStatus[slaveName].masterName === currentMaster) {
+                slavesToRemove.push({ id: cb.dataset.id, ip: cb.dataset.ip, name: cb.value });
+            }
+        });
+        
+        if (slavesToRemove.length === 0) {
+            showModalStatus('Geen slaves aangevinkt of de geselecteerde speakers maken geen deel uit van deze groep.', true);
+            return;
+        }
+        
+        let successCount = 0;
+        showModalStatus(`Start ontkoppeling van ${slavesToRemove.length} slave(s) (Ontkoppelen)...`);
+
+        // Stap 1: Stuur het removeZoneSlave commando naar de Master
+        for (const slave of slavesToRemove) {
+            const xmlRemoveSlave = `<zone master="${master.id}"><member ipaddress="${slave.ip}">${slave.id}</member></zone>`;
+            
+            const successRemove = await fetch(`http://${master.ip}:${BOSE_PORT}/removeZoneSlave`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/xml' }, body: xmlRemoveSlave, mode: 'no-cors'
+                      }).then(() => true).catch(() => false);
+            
+            await sleep(500);
+
+            if (successRemove) {
+                successCount++;
+            }
+            
+            await sleep(1000);
+        }
+        
+        if (successCount === slavesToRemove.length) {
+            showModalStatus(`? Alle ${successCount} geselecteerde slaves zijn succesvol ontkoppeld`, false);
+        } else {
+            showModalStatus(`?? Waarschuwing: ${successCount} van ${slavesToRemove.length} slaves zijn ontkoppeld. Controleer de anderen.`, true);
+        }
+        
+        openModal(currentMaster);
+    }
+
+    // --- API COMMUNICATIE FUNCTIES ---
+    
+    /**
+     * Schakelt een SLAVE tussen 'In Groep met Master' en 'Vrij'
+     */
+    async function toggleGroupSlave(slaveName) {
+        const masterName = MASTER_SPEAKER_NAME;
+        const master = FULL_SPEAKER_DATA[masterName];
+        const slave = FULL_SPEAKER_DATA[slaveName];
+        
+        const statusDiv = document.getElementById(`statusMessage-${slaveName}`);
+        if (statusDiv) {
+            statusDiv.style.color = 'orange';
+            statusDiv.textContent = `Bezig met ${slaveName} groepsstatus te schakelen...`;
+        }
+
+        // Stap 1: Haal de meest recente status op
+        await fetchGroupStatusForAll(); 
+        const statusData = currentGroupStatus[slaveName];
+        
+        const isCurrentlyGrouped = statusData.status === 'SLAVE' && statusData.masterName === masterName;
+        
+        let success = false;
+        let actionText = '';
+
+        if (isCurrentlyGrouped) {
+            // ACTIE: UIT DE GROEP HALEN (UNGROUP)
+            actionText = 'uit groep halen';
+            const xmlRemoveSlave = `<zone master="${master.id}"><member ipaddress="${slave.ip}">${slave.id}</member></zone>`;
+            
+            try {
+                 // 1. Verwijder de slave uit de zone via de Master
+                 await sendCommand(`http://${master.ip}:${BOSE_PORT}/removeZoneSlave`, xmlRemoveSlave, slaveName);
+                 await sleep(500);
+                 success = true;
+            } catch (e) {
+                 success = false;
+            }
+        } else {
+            // ACTIE: IN DE GROEP ZETTEN (GROUP)
+            actionText = 'in groep zetten';
+            
+            // Opbouwen van de complete zone-XML: Master + de nieuwe Slave
+            let xml = `<zone master="${master.id}">`;
+            xml += `<member ipaddress="${master.ip}">${master.id}</member>`;
+            xml += `<member ipaddress="${slave.ip}">${slave.id}</member>`; // Alleen de nieuwe slave
+            xml += `</zone>`;
+
+            try {
+                // Stuur de setZone-commando naar de Master
+                await sendCommand(`http://${master.ip}:${BOSE_PORT}/setZone`, xml, slaveName);
+                success = true;
+                
+                // FIX: Reset Master volume naar het veilige startvolume (0) na het groeperen
+                const safeMasterVolume = (masterName === MASTER_SPEAKER_NAME) ? 0 : 10; 
+                
+                // Wacht kort, want de speaker moet eerst Master geworden zijn
+                await sleep(1500); 
+                sendVolume(master.ip, masterName, safeMasterVolume); 
+
+            } catch (e) {
+                success = false;
+            }
+        }
+
+        // Update de status en de UI
+        updateStatus(slaveName, actionText, success);
+        
+        // Wacht even en werk dan de status bij om de knopkleur te verversen
+        await sleep(1000); 
+        await fetchGroupStatusForAll(); 
+        
+        // Forceer een directe status-update voor de Master
+        updateSpeakerStatus(MASTER_SPEAKER_NAME); 
+        
+        updateSpeakerStatus(slaveName);
+    }
+
+
+    function sendMuteToggle(ip, name) { 
+        const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+        const muteKey = 'MUTE';
+
+        const xmlFullClick = `<key state="press" sender="${SENDER_NAME}">${muteKey}</key>` +
+                             `<key state="release" sender="${SENDER_NAME}">${muteKey}</key>`;
+        
+        const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+        if (statusDiv) {
+            statusDiv.style.color = 'orange';
+            statusDiv.textContent = `Bezig met ${name} Mute/Unmute...`;
+        }
+
+        sendCommand(endpoint, xmlFullClick, name)
+        .then(() => {
+            updateStatus(name, 'Mute/Unmute', true);
+            updateSpeakerStatus(name); 
+        })
+        .catch(() => updateStatus(name, 'Mute/Unmute', false));
+    }
+
+    async function sendSourceKeyCyclicFixed(ip, name, key, clicks) { 
+        const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+        
+        const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+        if (statusDiv) {
+            statusDiv.style.color = 'orange';
+            statusDiv.textContent = `Bezig met ${name} bron selecteren...`;
+        }
+        
+        try {
+            for (let i = 0; i < clicks; i++) {
+                await sendCommand(endpoint, `<key state="press" sender="${SENDER_NAME}">${key}</key>`, name);
+                await sleep(100); 
+                await sendCommand(endpoint, `<key state="release" sender="${SENDER_NAME}">${key}</key>`, name);
+                await sleep(250); 
+            }
+
+            updateStatus(name, 'Bron gewijzigd', true);
+            updateSpeakerStatus(name);
+
+        } catch (error) {
+            updateStatus(name, 'Bron gewijzigd', false);
+        }
+    }
+    
+    /**
+     * Schakelt de stroom en stuurt een veilig volume-commando.
+     */
+    function togglePower(ip, name) {
+        const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+        const key = 'POWER';
+
+        const xmlFullClick = `<key state="press" sender="${SENDER_NAME}">${key}</key>` +
+                             `<key state="release" sender="${SENDER_NAME}">${key}</key>`;
+        
+        const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+        if (statusDiv) {
+            statusDiv.style.color = 'orange';
+            statusDiv.textContent = `Bezig met ${name} Power-status schakelen...`;
+        }
+        
+        sendCommand(endpoint, xmlFullClick, name)
+        .then(async () => { 
+            updateStatus(name, 'Power gewijzigd', true);
+            
+            // --- LOGICA VOOR GROEPSSTATUS NA UITSCHAKELEN (Fix) ---
+            const masterName = MASTER_SPEAKER_NAME;
+            const master = FULL_SPEAKER_DATA[masterName];
+            
+            // Wacht kort zodat de speaker kan reageren op de power toggle
+            await sleep(1000); 
+            await fetchGroupStatusForAll();
+            
+            const isMaster = (name === masterName);
+            const statusData = currentGroupStatus[name];
+            
+            // Als de speaker een SLAVE van de Master is én de actie was UITzetten, dan ontkoppelen
+            if (!isMaster && statusData.status === 'SLAVE' && statusData.masterName === masterName) {
+                
+                statusDiv.style.color = 'yellow';
+                statusDiv.textContent = `${name} was slave. Wacht 3s om te ontkoppelen...`;
+                
+                // Wacht nog even om de speaker in Standby te laten komen (ongeveer 3s)
+                await sleep(3000); 
+
+                // Stuur het commando naar de Master om de zojuist uitgezette Slave te verwijderen
+                const slave = FULL_SPEAKER_DATA[name];
+                const xmlRemoveSlave = `<zone master="${master.id}"><member ipaddress="${slave.ip}">${slave.id}</member></zone>`;
+                
+                await fetch(`http://${master.ip}:${BOSE_PORT}/removeZoneSlave`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/xml' }, body: xmlRemoveSlave, mode: 'no-cors'
+                }).then(() => {
+                    statusDiv.style.color = 'green';
+                    statusDiv.textContent = `${name} is succesvol uit de groep verwijderd.`;
+                    currentGroupStatus[name] = { status: 'VRIJ', masterName: null }; // Update de cache
+                }).catch(e => {
+                    statusDiv.style.color = 'red';
+                    statusDiv.textContent = `Fout bij ontkoppelen ${name}. Handmatig ontkoppelen vereist.`;
+                    console.error("Fout bij ontkoppelen na Power Toggle:", e);
+                });
+                
+                await sleep(1000); // Wacht kort na ontkoppeling
+                await fetchGroupStatusForAll(); // Forceer herladen van alle groepsstatussen
+
+            } else {
+                // Bij het AAN-zetten van de speaker, stuur een veilig volume na 2 seconden.
+                // AANGEPAST: Bepaal volume 10 (eerste cijfer) voor de Master (Inloopkast), 10 voor de andere speakers.
+                const newVolume = (name === MASTER_SPEAKER_NAME) ? 10 : 10; 
+
+                setTimeout(() => {
+                     sendVolume(ip, name, newVolume); 
+                }, 2000); 
+
+                // OPLOSSING VOOR WOONKAMER STANDBY-BUG: Wacht 2 seconden voordat we de bronstatus opvragen.
+                if (name === 'Woonkamer') {
+                    await sleep(2000); 
+                }
+            }
+            // --- EINDE NIEUWE LOGICA ---
+            
+            updateSpeakerStatus(name);
+            
+        })
+        .catch(() => updateStatus(name, 'Power gewijzigd', false));
+    }
+
+    function updateVolumeLabel(name, volume) {
+        const volumeLabel = document.getElementById(`volumeLabel-${name}`);
+        if (volumeLabel) {
+             volumeLabel.textContent = String(volume); 
+        }
+    }
+
+    /**
+     * Zendt het volume-commando naar de speaker.
+     */
+    function sendVolume(ip, name, volume) {
+        const endpoint = `http://${ip}:${BOSE_PORT}/volume`;
+        
+        const volumeToSend = parseInt(volume, 10); 
+        const xmlVolume = `<volume>${volumeToSend}</volume>`;
+        
+        const statusDiv = document.getElementById(name === MASTER_SPEAKER_NAME ? `statusMessage-master` : `statusMessage-${name}`);
+        if (statusDiv) {
+            statusDiv.style.color = 'orange';
+            statusDiv.textContent = `Bezig met ${name} volume instellen op ${volumeToSend}...`;
+        }
+        
+        // Zet de UI slider en label op de nieuwe waarde.
+        const volumeSlider = document.getElementById(`volumeSlider-${name}`);
+        if(volumeSlider) volumeSlider.value = volumeToSend;
+        updateVolumeLabel(name, volumeToSend); 
+
+        sendCommand(endpoint, xmlVolume, name)
+        .then(() => {
+            updateStatus(name, `Volume ingesteld op ${volumeToSend}`, true);
+        })
+        .catch(() => {
+             updateStatus(name, 'Volume instellen', false);
+        });
+    }
+    
+    // --- STARTPUNT ---
+    document.addEventListener('DOMContentLoaded', () => {
+         generateTwoColumnLayout();
+    });
+
+</script>
+</body>
+</html>
