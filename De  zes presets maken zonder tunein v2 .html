@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose SoundTouch Preset Manager (Lokaal)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #093340;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #e1e8eb;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #113742;
+        }
+        .preset-form { /* De .speaker-list is verwijderd, de .preset-form blijft over */
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #040f21;
+            border-radius: 6px;
+        }
+        /* Aangepast voor betere meldingen weergave */
+        .preset-item {
+            display: flex;
+            flex-wrap: wrap; /* Zorgt ervoor dat status-div naar de volgende regel gaat */
+            align-items: center;
+            margin-bottom: 25px; /* Meer ruimte onder elk preset-blok */
+            padding: 10px;
+            border: 1px solid #040f21;
+            border-radius: 4px;
+        }
+        .preset-controls {
+            display: flex;
+            align-items: center;
+            width: 100%; /* Neem de volledige breedte in voor de controls */
+        }
+        .preset-item label {
+            font-weight: bold;
+            flex-basis: 80px;
+            flex-shrink: 0;
+        }
+        .preset-item input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            margin-right: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .preset-item button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+        .preset-item button:hover {
+            background-color: #218838;
+        }
+        /* Nieuwe stijl voor de status-div om deze mooi te positioneren */
+        .status-output {
+            margin-top: 10px;
+            font-size: 0.9em;
+            width: 100%; /* Zorgt ervoor dat het onder de controls staat */
+            padding: 10px 0 0 80px; /* Padding om onder de label/inputs te staan */
+            box-sizing: border-box;
+        }
+        .status-message {
+            margin: 2px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .status-message::before {
+            content: '•';
+            position: absolute;
+            left: 5px;
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+        }
+        .note {
+            background-color: #d1ecf1;
+            border-left: 5px solid #007bff;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        /* De volgende stijlen zijn nu niet meer nodig, maar kunnen blijven staan zonder effect. */
+        .text-area-container {
+            position: relative;
+        }
+        .speaker-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: monospace;
+            padding: 10px;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bose SoundTouch Preset Manager</h1>
+
+    <div class="preset-form">
+        <h2>1. Configureer de 6 Presets (TuneIn ID) 📻</h2> <p>Vul de **TuneIn Station ID** en een duidelijke naam in. Klik op de knop om deze preset op **alle 6 speakers** op te slaan.</p>
+        <div id="presetInputs">
+            </div>
+    </div>
+
+</div>
+
+<script>
+    const BOSE_PORT = 8090;
+
+    // Direct ingevulde speakerlijst
+    const SPEAKERS = {
+        "Soundtouch 300 woonkamer": "192.168.1.50",
+        "Soundtouch 20 keuken": "192.168.1.51",
+        "Soundtouch 10 achtertuin": "192.168.1.53",
+        "Soundtouch 20 garage": "192.168.1.54",
+        "Soundtouch 20 hobbyzolder": "192.168.1.55",
+        "Soundtouch 10 inloopkast": "192.168.1.52"
+    };
+
+    // Functie om de HTML-velden voor de presets te genereren
+    function createPresetFields() {
+        const container = document.getElementById('presetInputs');
+        for (let i = 1; i <= 6; i++) {
+            const div = document.createElement('div');
+            div.classList.add('preset-item');
+            div.innerHTML = `
+                <div class="preset-controls">
+                    <label for="presetId${i}">Preset ${i}:</label>
+                    <input type="text" id="presetId${i}" placeholder="Station ID (bv. s33828)" required>
+                    <input type="text" id="presetName${i}" placeholder="Naam (bv. Nieuwe Zender ${i})" value="" required> 
+                    <button onclick="savePresetToAll(${i})">Sla Preset ${i} op naar alle Speakers</button>
+                </div>
+                <div class="status-output" id="status-preset-${i}"></div>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    // De hoofdfunctie om de preset op alle speakers op te slaan
+    function savePresetToAll(presetId) {
+        const stationId = document.getElementById(`presetId${presetId}`).value.trim();
+        let stationName = document.getElementById(`presetName${presetId}`).value.trim();
+        const statusDiv = document.getElementById(`status-preset-${presetId}`);
+        statusDiv.innerHTML = ''; // Status resetten
+        
+        if (!stationId) {
+            statusDiv.innerHTML = `<p class="status-message error-message">❌ Fout: Vul een **Station ID** in voor Preset ${presetId}.</p>`;
+            return;
+        }
+
+        // Gebruik de placeholder als naam als de gebruiker het leeg laat
+        if (!stationName) {
+            stationName = document.getElementById(`presetName${presetId}`).placeholder.replace('Naam (bv. ', '').replace(')','');
+        }
+
+        // De basis XML voor een TuneIn-station
+        const contentXml = `
+          <ContentItem source="TUNEIN" type="stationurl" location="/v1/playback/station/${stationId}" sourceAccount="" isPresetable="true">
+            <itemName>${stationName}</itemName>
+            </ContentItem>`;
+
+        // Stuur het commando naar elke speaker
+        for (const [name, ip] of Object.entries(SPEAKERS)) {
+            storePreset(ip, name, presetId, contentXml);
+        }
+    }
+
+    // Functie om de preset naar één specifieke speaker te sturen (gebruikt de lokale API)
+    async function storePreset(ip, name, presetId, contentXml) {
+        const endpoint = `http://${ip}:${BOSE_PORT}/storePreset`;
+        const statusDiv = document.getElementById(`status-preset-${presetId}`);
+        
+        // Maak een nieuw element voor de individuele status
+        const speakerStatus = document.createElement('p');
+        speakerStatus.classList.add('status-message');
+        speakerStatus.textContent = `Bezig met opslaan op ${name}...`;
+        speakerStatus.style.color = 'blue';
+        statusDiv.appendChild(speakerStatus);
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/xml' 
+                },
+                body: `<preset id="${presetId}" createdOn="${Math.floor(Date.now() / 1000)}" updatedOn="${Math.floor(Date.now() / 1000)}">${contentXml}</preset>`
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                // Toon een beknopte foutmelding
+                throw new Error(`HTTP fout: ${response.status}`);
+            }
+
+            speakerStatus.textContent = `✅ Preset ${presetId} succesvol opgeslagen op ${name}.`;
+            speakerStatus.classList.add('success-message');
+            speakerStatus.style.color = ''; // Reset naar standaard groene kleur van CSS
+
+        } catch (error) {
+            speakerStatus.textContent = `❌ Fout bij opslaan op ${name}.`;
+            speakerStatus.classList.add('error-message');
+            speakerStatus.style.color = ''; // Reset naar standaard rode kleur van CSS
+            console.error(`Fout bij ${name} Preset Opslaan:`, error);
+        }
+    }
+
+    // Start bij het laden van de pagina
+    createPresetFields();
+</script>
+
+</body>
+</html>

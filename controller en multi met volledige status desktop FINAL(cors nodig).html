@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose Multi-Room Desktop Controller (Definitief Gecorrigeerd)</title>
+    <style>
+        /* --- STIJLEN (Behouden) --- */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            background-color: #093340;
+            color: #333;
+        }
+        h1 { color: #c1c9d6; margin-bottom: 20px; }
+        .speaker-grid {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            width: 100%;
+            max-width: 1400px; 
+        }
+        .master-controller {
+            margin: 15px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #e1e8eb;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%; 
+            min-height: 550px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box; 
+        }
+        @media (min-width: 900px) { 
+            .master-controller {
+                width: calc(33.333% - 30px); 
+            }
+        }
+        @media (min-width: 650px) and (max-width: 899px) {
+            .master-controller {
+                width: calc(50% - 30px);
+            }
+        }
+        .speaker-header {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .speaker-header h2 { 
+            color: #113742; 
+            margin: 0; 
+            font-size: 24px; 
+        }
+        .power-status-display {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin-top: 5px; 
+            display: inline-block;
+        }
+        .power-on { background-color: #e1e8eb; color: #011208; }
+        .power-off { background-color: #dc3545; color: white; }
+        .speaker-details {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+        }
+        .current-source-display {
+            display: block;
+            min-height: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            margin-top: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .preset-buttons button {
+            width: 48%; 
+            box-sizing: border-box; 
+            height: 50px; 
+            padding: 5px; 
+            font-size: 14px; 
+            margin: 4px 0; 
+            background-color: #a3b3cf; 
+            color: #333; 
+            border: 1px solid #ddd;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .preset-buttons button:hover { background-color: #007bff; color: white; }
+        .source-buttons { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 10px; 
+            flex-wrap: wrap; 
+            border-top: 1px dashed #ddd; 
+            padding-top: 10px; 
+        }
+        .source-buttons button { 
+            padding: 10px 5px; 
+            font-size: 13px; 
+            margin: 2px 2px; 
+            height: 45px; 
+            font-weight: bold; 
+            width: 32%; 
+            box-sizing: border-box;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .power-button { background-color: #28a745; color: white; }
+        .tv-button { background-color: #dc3545; color: white; }
+        .bt-button { background-color: #007bff; color: white; }
+        .source-button-combined { background-color: #6c757d; color: white; width: 64% !important; }
+        .multiroom-btn { 
+            background-color: #ffc107; 
+            color: #333; 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 5px; 
+            border: none; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .multiroom-btn:hover { background-color: #e0a800; }
+        .mute-button { width: 100%; padding: 10px; margin-top: 5px; background-color: #ffc107; color: #333; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .mute-button:hover { background-color: #e0a800; }
+        .mute-button.is-muted { background-color: #dc3545; color: white; }
+        .mute-button.is-muted:hover { background-color: #c82333; }
+        .status-message { margin-top: 10px; font-weight: bold; font-size: 14px; min-height: 20px; display: block; }
+        .volume-control { margin-top: 15px; text-align: left; padding: 0 10px; border-top: 1px dashed #ddd; padding-top: 10px; }
+        .volume-control input[type="range"] { width: 100%; margin: 5px 0 10px 0; }
+        .volume-label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; }
+
+        /* MODAL STYLES (Behouden) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); 
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .slave-list label { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            margin-bottom: 10px; 
+            font-size: 16px; 
+            padding: 5px 0;
+            border-bottom: 1px dotted #eee;
+        }
+        .slave-list input[type="checkbox"] {
+            margin-right: 0;
+            width: 20px;
+            height: 20px;
+        }
+        .slave-list .slave-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .slave-status {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        .status-grouped { background-color: #28a745; color: white; }
+        .status-available { background-color: #ffc107; color: #333; }
+        .status-is-slave { background-color: #007bff; color: white; } 
+
+        .modal-buttons button { 
+            margin-top: 15px; 
+            padding: 10px 15px; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .modal-group-btn { background-color: #28a745; color: white; }
+        .modal-ungroup-btn { background-color: #dc3545; color: white; }
+        .modal-status { 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 5px; 
+            display: none; 
+            font-size: 14px;
+        }
+        .modal-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .modal-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        /* --- STIJL EINDE --- */
+    </style>
+</head>
+<body>
+
+    <h1>Bose Multi-Room Desktop Controller</h1>
+    
+    <div class="speaker-grid" id="speakerGrid">
+        </div>
+
+    <div id="multiroomModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Multi-room Instellingen</h3>
+            <p>Master: <strong><span id="modalMasterName"></span></strong></p>
+            <p style="font-size: 14px; color: #666;">Selecteer de **Slaves** om te groeperen of te verwijderen:</p>
+            
+            <div class="slave-list" id="modalSlaveCheckboxes">
+                </div>
+
+            <div class="modal-buttons">
+                <button class="modal-group-btn" onclick="groupSpeakers()">GROEP MAKEN / WIJZIGEN</button>
+                <button class="modal-ungroup-btn" onclick="ungroupSelectedSlaves()">SLAVES VERWIJDEREN</button>
+            </div>
+            
+            <div id="modalStatus" class="modal-status"></div>
+        </div>
+    </div>
+
+    <script>
+        // Globale Status Variabele
+        let statusTimer = null; 
+        
+        // Configuratie constanten
+        const BOSE_PORT = 8090;
+        const SENDER_NAME = "Gabbo"; 
+        const STATUS_TIMEOUT_MS = 5000; 
+        const POLLING_INTERVAL_MS = 5000; 
+        
+        // --- VOLLEDIGE SPEAKER DATA (PAS DEZE AAN MET UW EIGEN IP's, MAC's, etc.) ---
+        const FULL_SPEAKER_DATA = {
+            'Woonkamer': { ip: '192.168.1.50', mac: '50:F1:4A:6D:7F:10', id: '985DAD2E2A87', model: 'ST300' },
+            'Keuken': { ip: '192.168.1.51', mac: 'F0:45:DA:E8:01:52', id: '587A627721B0', model: 'ST20' },
+            'Achtertuin': { ip: '192.168.1.53', mac: '74:DA:EA:C2:F2:AE', id: '68C90B401F23', model: 'ST10' },
+            'Garage': { ip: '192.168.1.54', mac: '00:0C:8A:B3:83:DC', id: '000C8AB383D7', model: 'ST20' },
+            'Hobbyzolder': { ip: '192.168.1.55', mac: 'A8:1B:6A:92:54:F0', id: '38D26970662E', model: 'ST20' },
+            'Inloopkast': { ip: '192.168.1.52', mac: '74:DA:EA:F6:20:AE', id: 'EC24B8861023', model: 'ST10' }
+        };
+
+        const SPEAKERS = Object.keys(FULL_SPEAKER_DATA).reduce((acc, name) => {
+            acc[name] = FULL_SPEAKER_DATA[name].ip;
+            return acc;
+        }, {});
+        
+        // GLOBALE VARIABELE VOOR HET OPSLAAN VAN OPGEHAALDE PRESET NAMEN (per speaker)
+        let SPEAKER_PRESETS = {}; 
+        
+        const SPEAKER_KEYS = Object.keys(SPEAKERS);
+        let currentMaster = null; 
+        let currentGroupStatus = {}; 
+        
+        /** Hulpfunctie om een pauze in te lassen */
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        // --- HULP & STATUS FUNCTIES ---
+
+        /** Hulpfunctie om de POST request te versturen naar een endpoint (voor COMMANDO'S). */
+        function sendCommand(endpoint, xmlBody, name) {
+             const statusDiv = document.getElementById(`statusMessage-${name}`);
+
+             return fetch(endpoint, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/xml' },
+                 body: xmlBody,
+                 mode: 'no-cors' 
+             }).then(response => {
+                 if (response.ok || response.status === 200 || response.type === 'opaque') {
+                     return response;
+                 } else {
+                     throw new Error(`HTTP status ${response.status}`);
+                 }
+             }).catch(error => {
+                 if (error.message.includes('fetch') && statusDiv) {
+                     statusDiv.style.color = 'red';
+                     statusDiv.textContent = `? Fout bij communicatie met ${name}. Zorg dat de speaker AAN staat.`;
+                     console.error(`Fout bij ${name}:`, error);
+                 }
+                 throw error; 
+             });
+        }
+
+        /** Zendt een GET request naar een endpoint en parset de XML (voor STATUS). */
+        async function fetchStatus(ip, name, endpointSuffix, timeout = STATUS_TIMEOUT_MS) {
+            const endpoint = `http://${ip}:${BOSE_PORT}${endpointSuffix}`;
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                const response = await fetch(endpoint, { 
+                    method: 'GET', 
+                    headers: { 'Content-Type': 'application/xml' },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId); 
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP status ${response.status}`);
+                }
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "application/xml");
+                
+                // STANDBY-STATUS CHECK (nodig voor Power Status en om fouten bij UIT te voorkomen)
+                if (endpointSuffix === '/nowPlaying' || endpointSuffix === '/volume' || endpointSuffix === '/getZone') {
+                    const nowPlayingElement = xmlDoc.querySelector('nowPlaying');
+                    const sourceAttr = nowPlayingElement ? nowPlayingElement.getAttribute('source') : null;
+                    const playStatusElement = xmlDoc.querySelector('playStatus');
+                    
+                    if ((sourceAttr && sourceAttr.toUpperCase() === 'STANDBY') || (playStatusElement && playStatusElement.textContent.toUpperCase() === 'STANDBY')) {
+                        return { xmlDoc: xmlDoc, isOnline: false }; 
+                    }
+                }
+                
+                return { xmlDoc: xmlDoc, isOnline: true };
+
+            } catch (error) {
+                clearTimeout(timeoutId);
+                
+                // Laat de rode foutmelding zien, maar laat de status op UIT staan
+                if (error.name !== 'AbortError') {
+                    const statusDiv = document.getElementById(`statusMessage-${name}`);
+                    if (statusDiv) {
+                        statusDiv.style.color = 'red';
+                        statusDiv.textContent = `? Kon status (${name}) niet ophalen. Is deze aan? (Netwerkfout)`;
+                    }
+                }
+                
+                return { xmlDoc: null, isOnline: false };
+            }
+        }
+        
+        /** Status update helper voor alle commando's (Hoofdcontroller) */
+        function updateStatus(name, action, success) {
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (!statusDiv) return;
+
+            if (success) {
+                statusDiv.style.color = 'green';
+                statusDiv.textContent = `? ${name}: ${action} succesvol.`;
+            } else {
+                statusDiv.style.color = 'red';
+                statusDiv.textContent = `? ${name}: Fout bij ${action}.`;
+            }
+        }
+
+        /** Toont statusmeldingen in het modale venster (Multi-room) */
+        function showModalStatus(message, isError = false) {
+            const statusDiv = document.getElementById('modalStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = isError ? 'modal-status modal-error' : 'modal-status modal-success';
+            statusDiv.style.display = 'block';
+            setTimeout(() => statusDiv.style.display = 'none', 7000);
+        }
+
+        /** Werkt de Powerstatus (AAN/UIT) in de header bij. */
+        function updatePowerStatusDisplay(isOnline, name) {
+            const powerSpan = document.getElementById(`powerStatusDisplay-${name}`);
+            
+            const muteButton = document.getElementById(`muteButton-${name}`);
+            const sourceDisplay = document.getElementById(`currentSourceDisplay-${name}`);
+            
+            if (!powerSpan) return;
+
+            if (isOnline) {
+                powerSpan.textContent = 'Online';
+                powerSpan.className = 'power-status-display power-on';
+            } else {
+                powerSpan.textContent = 'UIT';
+                powerSpan.className = 'power-status-display power-off';
+                
+                // Update Source & Mute UI om aan te geven dat de speaker uit is
+                if (muteButton) {
+                    muteButton.classList.remove('is-muted');
+                    muteButton.textContent = 'MUTE / UNMUTE';
+                }
+                if (sourceDisplay) {
+                    sourceDisplay.textContent = 'Speaker is UIT (Standby).';
+                }
+            }
+        }
+
+        // --- STATUS OPHALEN & UPDATEN ---
+        
+        /** Haalt zone/groepsstatus op van EEN enkele speaker. */
+        async function fetchZone(ip, name) { 
+            const result = await fetchStatus(ip, name, '/getZone', STATUS_TIMEOUT_MS); 
+            if (!result.xmlDoc) return []; 
+            
+            try {
+                const zoneElement = result.xmlDoc.querySelector('zone');
+                if (!zoneElement) return []; 
+                const masterId = zoneElement.getAttribute('master');
+                const members = result.xmlDoc.querySelectorAll('member');
+                const groupMembers = [];
+                members.forEach(member => {
+                    const memberId = member.textContent;
+                    const memberName = Object.keys(FULL_SPEAKER_DATA).find(key => FULL_SPEAKER_DATA[key].id === memberId);
+                    if (memberName) {
+                        groupMembers.push({
+                            name: memberName,
+                            id: memberId,
+                            isMaster: memberId === masterId
+                        });
+                    }
+                });
+                return groupMembers;
+            } catch (e) {
+                console.error("Fout bij parsen zone XML:", e);
+                return [];
+            }
+        }
+        
+        /** Haalt de groepsstatus van ALLE speakers op en vult currentGroupStatus. */
+        async function fetchGroupStatusForAll() {
+            currentGroupStatus = {};
+            const promises = [];
+            for (const name of SPEAKER_KEYS) {
+                const data = FULL_SPEAKER_DATA[name];
+                promises.push(fetchZone(data.ip, name)); 
+            }
+            const allZones = await Promise.all(promises);
+            for (let i = 0; i < SPEAKER_KEYS.length; i++) {
+                const name = SPEAKER_KEYS[i];
+                const zone = allZones[i];
+                if (zone && zone.length > 1) { 
+                    const master = zone.find(m => m.isMaster);
+                    const slaves = zone.filter(m => !m.isMaster);
+                    if (master) {
+                        currentGroupStatus[master.name] = { status: 'MASTER', masterName: master.name };
+                        slaves.forEach(slave => {
+                            if (!currentGroupStatus[slave.name] || currentGroupStatus[slave.name].status !== 'MASTER') {
+                                currentGroupStatus[slave.name] = { status: 'SLAVE', masterName: master.name };
+                            }
+                        });
+                    }
+                }
+            }
+            for (const name of SPEAKER_KEYS) {
+                 if (!currentGroupStatus[name]) {
+                    currentGroupStatus[name] = { status: 'VRIJ', masterName: null };
+                 }
+            }
+        }
+
+        /** Haalt de actieve source/station naam op en werkt de UI bij. */
+        async function fetchNowPlayingAndSource(ip, name) {
+            const nowPlayingResult = await fetchStatus(ip, name, '/nowPlaying');
+            const displayElement = document.getElementById(`currentSourceDisplay-${name}`); 
+
+            if (!displayElement) return;
+
+            if (!nowPlayingResult.isOnline || !nowPlayingResult.xmlDoc) {
+                displayElement.textContent = 'Speaker is UIT.';
+                return;
+            }
+
+            try {
+                const sourceElement = nowPlayingResult.xmlDoc.querySelector('nowPlaying');
+                const stationNameElement = nowPlayingResult.xmlDoc.querySelector('stationName');
+                const itemNameElement = nowPlayingResult.xmlDoc.querySelector('ContentItem itemName'); 
+
+                let displayText = 'Huidige Bron: ONBEKEND';
+
+                if (sourceElement) {
+                    const source = sourceElement.getAttribute('source');
+
+                    if (source === 'STANDBY') {
+                        displayText = 'Speaker is in Standby.';
+                    } else if (source === 'TUNEIN' || source === 'SPOTIFY' || source === 'DEEZER') {
+                        if (stationNameElement && stationNameElement.textContent) {
+                            displayText = `Speelt: ${stationNameElement.textContent}`;
+                        } else if (itemNameElement && itemNameElement.textContent) {
+                            displayText = `Speelt: ${itemNameElement.textContent}`;
+                        } else {
+                            displayText = `Bron: ${source.toUpperCase()} (Laden...)`;
+                        }
+                    } else if (source === 'AUX_INPUT') {
+                        displayText = 'Bron: AUX (Bluetooth / Analoog)';
+                    } else if (source === 'PRODUCT' || source === 'TV' || source === 'HDMI_1') {
+                        displayText = 'Bron: TV / HDMI';
+                    } else {
+                        displayText = `Bron: ${source}`;
+                    }
+                }
+
+                displayElement.textContent = displayText;
+
+            } catch (e) {
+                console.error(`Fout bij parsen nowPlaying XML voor ${name}:`, e);
+                displayElement.textContent = 'Kon de bron niet bepalen.';
+            }
+        }
+        
+        /** NIEUWE FUNCTIE: Haalt de presetnamen op en werkt de globale variabele bij. */
+        async function fetchPresets(ip, name) {
+            const presetsResult = await fetchStatus(ip, name, '/presets');
+            
+            if (!presetsResult.isOnline || !presetsResult.xmlDoc) {
+                // Wis de presets als de speaker uit is, maar behoud de laatst bekende bij online.
+                if (!presetsResult.isOnline) {
+                    SPEAKER_PRESETS[name] = []; 
+                }
+                return;
+            }
+
+            try {
+                const presets = [];
+                const presetElements = presetsResult.xmlDoc.querySelectorAll('preset');
+                
+                presetElements.forEach(element => {
+                    const id = element.getAttribute('id');
+                    const nameElement = element.querySelector('itemName');
+                    let presetName = `Preset ${id}`; // Standaard naam
+
+                    if (nameElement && nameElement.textContent) {
+                        presetName = nameElement.textContent;
+                    }
+
+                    // Zoek de knop om direct bij te werken
+                    const button = document.querySelector(`#controller-${name} .preset-buttons button[title="Preset ${id}"]`);
+                    if (button) {
+                        button.textContent = presetName;
+                    }
+                    
+                    presets.push({ id, name: presetName });
+                });
+                
+                SPEAKER_PRESETS[name] = presets;
+
+            } catch (e) {
+                console.error(`Fout bij parsen Presets XML voor ${name}:`, e);
+                // Behoud de presets in de globale variabele, maar toon fout in console.
+            }
+        }
+
+
+        /**
+         * Haalt Power, Mute en HUIDIGE Volume status op en werkt de UI bij.
+         * Bevat de fix voor het 'XXYY' volume probleem en mute parsing.
+         * Laatste fix: Zorgt voor synchronisatie van de SLIDER-knop.
+         */
+        async function fetchPowerAndMuteStatus(ip, name) {
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            const volumeSlider = document.getElementById(`volumeSlider-${name}`);
+            const volumeLabel = document.getElementById(`volume-${name}`);
+            
+            // Probeer de status op te halen
+            const volumeResult = await fetchStatus(ip, name, '/volume'); 
+            
+            // 1. Zorgt ervoor dat de Power UI wordt bijgewerkt
+            updatePowerStatusDisplay(volumeResult.isOnline, name); 
+            
+            if (!volumeResult.isOnline) {
+                if (statusDiv) statusDiv.textContent = `Speaker ${name} is UIT (Standby).`;
+                return;
+            }
+            
+            if (!volumeResult.xmlDoc) return; 
+
+            let currentVolume = null;
+            let isMuted = false;
+            let muteStatus = 'Onbekend';
+
+            try {
+                // ZOEK HET HOOFD VOLUME ELEMENT (<volume ...>)
+                const rootVolumeElement = volumeResult.xmlDoc.querySelector('volume'); 
+                
+                if (rootVolumeElement) {
+                    
+                    // --- VOLUME STATUS LEZEN ---
+                    const actualVolumeElement = rootVolumeElement.querySelector('actualvolume'); 
+                    if (actualVolumeElement && actualVolumeElement.textContent) {
+                        currentVolume = parseInt(actualVolumeElement.textContent, 10);
+                    } 
+                    else if (rootVolumeElement.getAttribute('volume')) {
+                        currentVolume = parseInt(rootVolumeElement.getAttribute('volume'), 10);
+                    }
+
+                    // --- MUTE STATUS LEZEN ---
+                    const muteAttr = rootVolumeElement.getAttribute('mute');
+                    if (muteAttr !== null) {
+                         isMuted = muteAttr.toLowerCase() === 'true';
+                    } 
+                    else {
+                         const muteEnabledElement = rootVolumeElement.querySelector('muteenabled');
+                         if (muteEnabledElement) {
+                            isMuted = muteEnabledElement.textContent.toLowerCase() === 'true';
+                         }
+                    }
+
+
+                    // --- UI UPDATE: SLIDER & LABEL (Fix voor synchronisatie) ---
+                    if (currentVolume !== null && volumeSlider && volumeLabel) {
+                         
+                         // Fix: Converteer naar een integer om toewijzingsfouten in de slider te voorkomen
+                         const newSliderValue = parseInt(currentVolume, 10);
+                         
+                         // Synchroniseer de slider ALTIJD Tenzij hij op dit moment wordt versleept in de browser.
+                         if (document.activeElement !== volumeSlider) {
+                              // **FIX: De waarde wordt expliciet als geparste integer ingesteld**
+                              volumeSlider.value = newSliderValue; 
+                         }
+                         
+                         // Het label (het nummer achter de slider) wordt ALTIJD bijgewerkt.
+                         volumeLabel.textContent = newSliderValue; 
+                    }
+                    
+                    // UI UPDATE: Mute Button
+                    const muteButton = document.getElementById(`muteButton-${name}`);
+                    if (muteButton) {
+                        muteButton.classList.toggle('is-muted', isMuted);
+                        muteButton.textContent = isMuted ? 'UNMUTE' : 'MUTE / UNMUTE';
+                    }
+                    
+                    muteStatus = isMuted ? 'AAN' : 'UIT';
+
+                    // Nieuwe, correcte statusmelding
+                    const volumeStatusDisplay = currentVolume !== null ? currentVolume : 'Onbekend';
+                    
+                    if (statusDiv && !statusDiv.textContent.startsWith('?')) {
+                         statusDiv.style.color = 'green';
+                         statusDiv.textContent = `? Status (${name}) succesvol opgehaald. Volume: ${volumeStatusDisplay}, Mute: ${muteStatus}.`;
+                    }
+
+
+                } else {
+                     throw new Error("Kon root <volume> element niet vinden in XML.");
+                }
+
+
+            } catch (e) {
+                console.error(`Fout bij parsen Volume/Mute XML voor ${name}:`, e);
+                if (statusDiv) {
+                     statusDiv.style.color = 'red';
+                     statusDiv.textContent = `? Kritieke fout bij Volume/Mute-status ophalen: ${e.message}`;
+                }
+            }
+        }
+        
+        /** Roept alle status-update functies aan voor EEN enkele speaker. */
+        function updateSpeakerStatus(name) {
+            const ip = SPEAKERS[name];
+            
+            fetchPowerAndMuteStatus(ip, name); // Power, Volume en Mute
+            fetchNowPlayingAndSource(ip, name); // Source/Zender
+            fetchPresets(ip, name); // NIEUW: Presetnamen
+        }
+
+        /**
+         * START en STOP de polling timer voor ALLE speakers. 
+         */
+        function managePolling(start) {
+            if (statusTimer) {
+                clearInterval(statusTimer);
+                statusTimer = null;
+            }
+            
+            if (start) {
+                // Voer direct uit bij start
+                SPEAKER_KEYS.forEach(name => updateSpeakerStatus(name));
+                
+                statusTimer = setInterval(() => {
+                    SPEAKER_KEYS.forEach(name => {
+                        updateSpeakerStatus(name);
+                    });
+                }, POLLING_INTERVAL_MS);
+            }
+        }
+
+        // --- UI & CORE FUNCTIES ---
+
+        /** Genereert de HTML voor één speakercontroller. */
+        function createSpeakerControllerHTML(name) {
+            const data = FULL_SPEAKER_DATA[name];
+            const ip = data.ip;
+            const model = data.model;
+            const isST300 = (model === "ST300");
+            
+            // Haal de lokaal opgeslagen presetnamen op, of gebruik placeholders
+            const presets = SPEAKER_PRESETS[name] || [];
+
+            // Genereer Presets
+            let presetButtonsHtml = '';
+            for (let i = 0; i < 6; i++) {
+                const presetNum = i + 1;
+                // Zoek de opgeslagen naam, anders gebruik een placeholder
+                const presetData = presets.find(p => parseInt(p.id) === presetNum);
+                const presetName = presetData ? presetData.name : `Preset ${presetNum} (Laden)`; 
+                
+                presetButtonsHtml += `<button title="Preset ${presetNum}" onclick="sendPreset('${ip}', '${name}', ${presetNum})">${presetName}</button>`;
+            }
+            
+            // Genereer Source Knoppen
+            let sourceButtonsHtml = '';
+            if (isST300) {
+                sourceButtonsHtml = `
+                    <button class="power-button" onclick="togglePower('${ip}', '${name}')">Aan/Uit</button>
+                    <button class="tv-button" onclick="selectSource('${ip}', '${name}', 'PRODUCT', 'HDMI_1', 'TV/HDMI')">TV/HDMI</button>
+                    <button class="bt-button" onclick="sendSourceKeyCyclicFixed('${ip}', '${name}', 'AUX_INPUT', 1)">BT</button>
+                `;
+            } else {
+                sourceButtonsHtml = `
+                    <button class="power-button" onclick="togglePower('${ip}', '${name}')">Aan/Uit</button>
+                    <button class="source-button-combined" onclick="sendSourceKeyCyclicFixed('${ip}', '${name}', 'AUX_INPUT', 1)">Bron (Aux/BT)</button>
+                `;
+            }
+            
+            // Monteer volledige Controller HTML
+            return `
+                <div class="master-controller" id="controller-${name}">
+                    <div>
+                        <div class="speaker-header">
+                            <h2>${name}</h2>
+                            <span id="powerStatusDisplay-${name}" class="power-status-display">Laden...</span>
+                        </div>
+                        
+                        <div class="speaker-details">
+                            IP: ${ip} | Model: ${model}
+                        </div>
+
+                        <span id="currentSourceDisplay-${name}" class="current-source-display">Laden huidige bron...</span>
+                        
+                        <div class="preset-buttons">
+                            ${presetButtonsHtml}
+                        </div>
+                        
+                        <div class="source-buttons">
+                            ${sourceButtonsHtml}
+                        </div>
+                    </div>
+                    
+                    <div class="speaker-actions-bottom">
+                         <button class="multiroom-btn" onclick="openModal('${name}')">MULTI-ROOM</button>
+
+                        <div class="volume-control">
+                            <div class="volume-label"><span>Volume:</span><span id="volume-${name}">10</span></div>
+                            <input type="range" min="0" max="100" value="10" id="volumeSlider-${name}" onchange="sendVolume('${ip}', '${name}', this.value)">
+                            <button class="mute-button" id="muteButton-${name}" onclick="sendMuteToggle('${ip}', '${name}')">MUTE / UNMUTE</button>
+                        </div>
+                        
+                        <span id="statusMessage-${name}" class="status-message">Klaar.</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        /** Laadt alle controllers in de grid en start de polling. */
+        function loadAllSpeakers() {
+            const grid = document.getElementById('speakerGrid');
+            if (!grid) return;
+            
+            // Start de polling direct om de eerste data (inclusief presets) op te halen
+            managePolling(true);
+
+            // Wacht een moment totdat de eerste preset-data is opgehaald voordat we de UI genereren
+            // Dit is een simpele oplossing; een robuustere app zou de UI updaten na elke succesvolle fetch.
+            setTimeout(() => {
+                grid.innerHTML = ''; 
+                
+                SPEAKER_KEYS.forEach(name => {
+                    grid.innerHTML += createSpeakerControllerHTML(name);
+                });
+            }, 1000); // 1 seconde wachten
+        }
+
+        // --- MODAL FUNCTIES (Onveranderd) ---
+        async function openModal(masterName) { 
+            currentMaster = masterName;
+            document.getElementById('modalMasterName').textContent = masterName;
+            document.getElementById('multiroomModal').style.display = 'block';
+            document.getElementById('modalStatus').style.display = 'none';
+
+            showModalStatus('Bezig met status ophalen van alle speakers voor Multi-room...');
+            await fetchGroupStatusForAll(); 
+
+            const slaveCheckboxesDiv = document.getElementById('modalSlaveCheckboxes');
+            slaveCheckboxesDiv.innerHTML = '';
+            
+            for (const name in FULL_SPEAKER_DATA) {
+                if (name !== masterName) {
+                    const data = FULL_SPEAKER_DATA[name];
+                    const statusData = currentGroupStatus[name];
+
+                    let isGrouped = false;
+                    let isDisabled = false;
+                    let statusClass = 'status-available';
+                    let statusText = 'Beschikbaar';
+
+                    if (statusData.status === 'SLAVE' && statusData.masterName === masterName) {
+                        isGrouped = true;
+                        statusClass = 'status-grouped';
+                        statusText = 'IN GROEP';
+                    } else if (statusData.status === 'SLAVE' || statusData.status === 'MASTER') {
+                        isDisabled = true; 
+                        statusClass = 'status-is-slave';
+                        statusText = (statusData.status === 'MASTER' ? 'ANDERE MASTER' : `SLAVE VAN ${statusData.masterName.toUpperCase()}`);
+                    }
+
+                    const checkedAttribute = isGrouped ? 'checked' : '';
+                    const disabledAttribute = isDisabled ? 'disabled' : '';
+
+                    const label = document.createElement('label');
+                    label.innerHTML = `
+                        <span class="slave-info">${name} 
+                            <span class="slave-status ${statusClass}">${statusText}</span>
+                        </span>
+                        <input type="checkbox" name="slave" value="${name}" data-id="${data.id}" data-ip="${data.ip}" ${checkedAttribute} ${disabledAttribute}>
+                    `;
+                    slaveCheckboxesDiv.appendChild(label);
+                }
+            }
+            showModalStatus('Klaar met status ophalen.');
+        }
+
+        function closeModal() {
+            document.getElementById('multiroomModal').style.display = 'none';
+            currentMaster = null;
+        }
+
+        function groupSpeakers() {
+            if (!currentMaster) {
+                showModalStatus('? Fout: Geen Master geselecteerd!', true);
+                return;
+            }
+
+            const master = FULL_SPEAKER_DATA[currentMaster];
+            const selectedSlaves = [];
+            const checkboxes = document.querySelectorAll('#modalSlaveCheckboxes input[type="checkbox"]:checked:not(:disabled)');
+
+            checkboxes.forEach(cb => {
+                selectedSlaves.push({ name: cb.value, id: cb.dataset.id, ip: cb.dataset.ip });
+            });
+
+            let xml = `<zone master="${master.id}">`;
+            xml += `<member ipaddress="${master.ip}">${master.id}</member>`;
+            selectedSlaves.forEach(slave => {
+                xml += `<member ipaddress="${slave.ip}">${slave.id}</member>`;
+            });
+            xml += `</zone>`;
+
+            showModalStatus(`Bezig met groeperen met ${selectedSlaves.length} slave(s)...`);
+            
+            sendCommand(`http://${master.ip}:${BOSE_PORT}/setZone`, xml, master.name || 'Master')
+            .then(() => {
+                showModalStatus(`? Groep succesvol aangemaakt/gewijzigd.`, false);
+                openModal(currentMaster); 
+            })
+            .catch(error => {
+                showModalStatus(`? Fout bij groeperen. Controleer of de Master aanstaat.`, true);
+                console.error('Groeperingsfout:', error);
+            });
+        }
+
+        async function sendPowerCommand(ip) {
+            const xmlPayload = `<key state="press" sender="${SENDER_NAME}">POWER</key><key state="release" sender="${SENDER_NAME}">POWER</key>`;
+            return fetch(`http://${ip}:${BOSE_PORT}/key`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/xml' },
+                body: xmlPayload,
+                mode: 'no-cors' 
+            }).then(() => true).catch(() => false);
+        }
+
+        async function ungroupSelectedSlaves() {
+            if (!currentMaster) {
+                showModalStatus('? Fout: Geen Master geselecteerd!', true);
+                return;
+            }
+
+            const master = FULL_SPEAKER_DATA[currentMaster];
+            const slavesToRemove = [];
+            const checkboxes = document.querySelectorAll('#modalSlaveCheckboxes input[type="checkbox"]:checked');
+
+            checkboxes.forEach(cb => {
+                const slaveName = cb.value;
+                if (currentGroupStatus[slaveName] && currentGroupStatus[slaveName].status === 'SLAVE' && currentGroupStatus[slaveName].masterName === currentMaster) {
+                    slavesToRemove.push({ id: cb.dataset.id, ip: cb.dataset.ip, name: cb.value });
+                }
+            });
+            
+            if (slavesToRemove.length === 0) {
+                showModalStatus('Geen slaves aangevinkt of de geselecteerde speakers maken geen deel uit van deze groep.', true);
+                return;
+            }
+            
+            let successCount = 0;
+            showModalStatus(`Start ontkoppeling van ${slavesToRemove.length} slave(s) (Ontkoppelen)...`);
+
+            // Stap 1: Stuur het removeZoneSlave commando naar de Master
+            for (const slave of slavesToRemove) {
+                const xmlRemoveSlave = `<zone master="${master.id}"><member ipaddress="${slave.ip}">${slave.id}</member></zone>`;
+                
+                const successRemove = await fetch(`http://${master.ip}:${BOSE_PORT}/removeZoneSlave`, {
+                            method: 'POST', headers: { 'Content-Type': 'application/xml' }, body: xmlRemoveSlave, mode: 'no-cors'
+                          }).then(() => true).catch(() => false);
+                
+                await sleep(500);
+
+                // Stap 2: Stuur een POWER commando naar de zojuist ontkoppelde Slave
+                const successPower = await sendPowerCommand(slave.ip);
+
+                if (successRemove && successPower) {
+                    successCount++;
+                }
+                
+                await sleep(1000);
+            }
+            
+            if (successCount === slavesToRemove.length) {
+                showModalStatus(`? Alle ${successCount} geselecteerde slaves zijn succesvol ontkoppeld`, false);
+            } else {
+                showModalStatus(`?? Waarschuwing: ${successCount} van ${slavesToRemove.length} slaves zijn ontkoppeld. Controleer de anderen.`, true);
+            }
+            
+            openModal(currentMaster);
+        }
+
+        // --- API COMMUNICATIE FUNCTIES ---
+
+        function sendMuteToggle(ip, name) { 
+            const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+            const muteKey = 'MUTE';
+
+            const xmlFullClick = `<key state="press" sender="${SENDER_NAME}">${muteKey}</key>` +
+                                 `<key state="release" sender="${SENDER_NAME}">${muteKey}</key>`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name} Mute/Unmute...`;
+            }
+
+            sendCommand(endpoint, xmlFullClick, name)
+            .then(() => {
+                updateStatus(name, 'Mute/Unmute', true);
+                // Forceer status update om de nieuwe mute-status direct op te halen
+                updateSpeakerStatus(name); 
+            })
+            .catch(() => updateStatus(name, 'Mute/Unmute', false));
+        }
+
+        async function selectSource(ip, name, sourceName, sourceAccount, buttonLabel) { 
+            const endpoint = `http://${ip}:${BOSE_PORT}/select`;
+            const xmlContentItem = `<ContentItem source="${sourceName}" sourceAccount="${sourceAccount}" isPresetable="true" />`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name} ${buttonLabel} selecteren...`;
+            }
+            
+            sendCommand(endpoint, xmlContentItem, name)
+            .then(() => {
+                 updateStatus(name, buttonLabel + ' selecteren', true);
+                 // Forceer status update om de nieuwe source direct op te halen
+                 updateSpeakerStatus(name);
+            })
+            .catch(() => updateStatus(name, buttonLabel + ' selecteren', false));
+        }
+
+        async function sendSourceKeyCyclicFixed(ip, name, key, clicks) { 
+            const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name} bron selecteren...`;
+            }
+            
+            try {
+                for (let i = 0; i < clicks; i++) {
+                    await sendCommand(endpoint, `<key state="press" sender="${SENDER_NAME}">${key}</key>`, name);
+                    await sleep(100); 
+                    await sendCommand(endpoint, `<key state="release" sender="${SENDER_NAME}">${key}</key>`, name);
+                    await sleep(250); 
+                }
+
+                updateStatus(name, 'Bron gewijzigd', true);
+                // Forceer status update om de nieuwe source direct op te halen
+                updateSpeakerStatus(name);
+
+            } catch (error) {
+                updateStatus(name, 'Bron gewijzigd', false);
+            }
+        }
+        
+        /**
+         * Schakelt de stroom en stuurt een veilig volume-commando.
+         */
+        function togglePower(ip, name) {
+            const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+            const key = 'POWER';
+
+            const xmlFullClick = `<key state="press" sender="${SENDER_NAME}">${key}</key>` +
+                                 `<key state="release" sender="${SENDER_NAME}">${key}</key>`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name} Power-status schakelen...`;
+            }
+            
+            sendCommand(endpoint, xmlFullClick, name)
+            .then(() => {
+                updateStatus(name, 'Power gewijzigd', true);
+                
+                // Bij het AAN-zetten van de speaker, stuur een veilig volume van 10 na 2 seconden.
+                setTimeout(() => {
+                     sendVolume(ip, name, 10); 
+                }, 2000); 
+
+                // Forceer direct een Power/Source status check
+                updateSpeakerStatus(name);
+            })
+            .catch(() => updateStatus(name, 'Power gewijzigd', false));
+        }
+
+        function updateVolumeLabel(name, volume) {
+            const volumeLabel = document.getElementById(`volume-${name}`);
+            if (volumeLabel) {
+                 // Zorg ervoor dat de waarde als string wordt gezet 
+                 volumeLabel.textContent = String(volume); 
+            }
+        }
+
+        /**
+         * Zendt het volume-commando naar de speaker.
+         */
+        function sendVolume(ip, name, volume) {
+            const endpoint = `http://${ip}:${BOSE_PORT}/volume`;
+            
+            const volumeToSend = parseInt(volume, 10); 
+            const xmlVolume = `<volume>${volumeToSend}</volume>`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name} volume instellen op ${volumeToSend}...`;
+            }
+            
+            // Zet de UI slider en label op de nieuwe waarde.
+            const volumeSlider = document.getElementById(`volumeSlider-${name}`);
+            if(volumeSlider) volumeSlider.value = volumeToSend;
+            updateVolumeLabel(name, volumeToSend); // Label bijwerken met het geparste getal
+
+            sendCommand(endpoint, xmlVolume, name)
+            .then(() => {
+                updateStatus(name, `Volume ingesteld op ${volumeToSend}`, true);
+            })
+            .catch(() => {
+                 updateStatus(name, 'Volume instellen', false);
+            });
+        }
+
+        async function sendPreset(ip, name, presetNumber) {
+            const endpoint = `http://${ip}:${BOSE_PORT}/key`;
+            const presetKey = `PRESET_${presetNumber}`;
+            
+            // Haal de lokaal opgeslagen naam op voor de statusmelding
+            const presetData = SPEAKER_PRESETS[name] ? SPEAKER_PRESETS[name].find(p => parseInt(p.id) === presetNumber) : null;
+            const presetName = presetData ? presetData.name : `Preset ${presetNumber}`;
+            
+            const statusDiv = document.getElementById(`statusMessage-${name}`);
+            if (statusDiv) {
+                statusDiv.style.color = 'orange';
+                statusDiv.textContent = `Bezig met ${name}: ${presetName} selecteren...`;
+            }
+
+            try {
+                await sendCommand(endpoint, `<key state="press" sender="${SENDER_NAME}">${presetKey}</key>`, name);
+                await sleep(100); 
+
+                await sendCommand(endpoint, `<key state="release" sender="${SENDER_NAME}">${presetKey}</key>`, name);
+                
+                updateStatus(name, presetName + ' geselecteerd', true);
+                // Forceer status update om de nieuwe source direct op te halen
+                updateSpeakerStatus(name);
+
+            } catch (error) {
+                updateStatus(name, presetName + ' selecteren', false);
+            }
+        }
+        
+        // --- STARTPUNT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (SPEAKER_KEYS.length > 0) {
+                loadAllSpeakers();
+            } else {
+                document.getElementById('speakerGrid').innerHTML = '<p>GEEN SPEAKERS GEVONDEN. Controleer de FULL_SPEAKER_DATA variabele in de code.</p>';
+            }
+        });
+
+    </script>
+</body>
+</html>

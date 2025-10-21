@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose SoundTouch Preset Manager (Definitief V7)</title> 
+    <style>
+        /* Algemene Opmaak */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #093340;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #e1e8eb;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #113742;
+        }
+        .preset-form, .search-form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #040f21;
+            border-radius: 6px;
+        }
+        
+        /* Preset Vormgeving */
+        .preset-item {
+            display: flex;
+            flex-wrap: wrap; 
+            align-items: center;
+            margin-bottom: 25px; 
+            padding: 10px;
+            border: 1px solid #040f21;
+            border-radius: 4px;
+        }
+        .preset-controls {
+            display: flex;
+            align-items: center;
+            width: 100%; 
+        }
+        .preset-item label {
+            font-weight: bold;
+            flex-basis: 80px;
+            flex-shrink: 0;
+        }
+        .preset-item input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            margin-right: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .preset-item button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+        .preset-item button:hover {
+            background-color: #218838;
+        }
+
+        /* Zoek Vormgeving */
+        .status-output {
+            margin-top: 10px;
+            font-size: 0.9em;
+            width: 100%; 
+            padding: 10px 0 0 80px; 
+            box-sizing: border-box;
+        }
+        .status-output.search-status {
+            padding-left: 0;
+        }
+        .status-message {
+            margin: 2px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .status-message::before {
+            content: '•';
+            position: absolute;
+            left: 5px;
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+        }
+        .note {
+            background-color: #d1ecf1;
+            border-left: 5px solid #007bff;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .speaker-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: monospace;
+            padding: 10px;
+            background-color: #e9ecef;
+        }
+
+        /* Stijl voor de nieuwe zoeksectie */
+        #url-search-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        #url-search-controls input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #url-search-controls button {
+            padding: 10px 15px;
+            background-color: #ffc107; 
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #url-search-controls button:hover {
+            background-color: #e0a800;
+        }
+        
+        #searchResults button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #searchResults input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 10px;
+            flex-grow: 1; 
+            min-width: 150px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bose SoundTouch Preset Manager</h1>
+
+    
+    <div class="search-form">
+        <h2>1. Handmatig TuneIn Station ID Vinden (Meest Betrouwbaar) 🔗</h2>
+        <p>Gebruik deze stappen om een geldige ID te vinden:</p>
+        
+        <ol>
+            <li>Klik op de knop om de TuneIn-website in een **nieuw Electron-venster** te openen.</li>
+            <li>Zoek de gewenste zender en ga naar de pagina van die zender.</li>
+            <li>**Kopieer de volledige URL** uit de adresbalk van het nieuwe venster.</li>
+            <li>Plak de URL hieronder en klik op 'Extract ID'.</li>
+        </ol>
+
+        <div id="url-search-controls">
+            <button onclick="openTuneInSearch()">1. Open TuneIn Zoekpagina 🌐</button>
+            <input type="text" id="tuneinURL" placeholder="2. Plak hier de TuneIn URL van de zender..." style="flex-grow: 1;">
+            <button onclick="processTuneInURL()">3. Extract ID en Naam</button>
+        </div>
+        
+        <div id="search-status" class="status-output search-status"></div>
+        <div id="searchResults" style="margin-top: 15px;">
+            </div>
+
+        <div class="note" style="background-color: #d4edda; border-color: #155724;">
+            ✅ Na extractie verschijnt de ID en Naam hieronder. U kunt de naam aanpassen en vervolgens toewijzen.
+        </div>
+    </div>
+    
+    <div class="preset-form">
+        <h2>2. Configureer de 6 Presets (TuneIn ID) 📻</h2>
+        <p>Vul de **TuneIn Station ID** en een duidelijke naam in. Klik op de knop om deze preset op **alle 6 speakers** op te slaan.</p>
+        <div id="presetInputs">
+            </div>
+    </div>
+
+</div>
+
+<script>
+    const BOSE_PORT = 8090;
+
+    const SPEAKERS = {
+        "Soundtouch 300 woonkamer": "192.168.1.50",
+        "Soundtouch 20 keuken": "192.168.1.51",
+        "Soundtouch 10 achtertuin": "192.168.1.53",
+        "Soundtouch 20 garage": "192.168.1.54",
+        "Soundtouch 20 hobbyzolder": "192.168.1.55",
+        "Soundtouch 10 inloopkast": "192.168.1.52"
+    };
+
+    // --- TUNEIN ZOEK OPLOSSING FUNCTIES ---
+
+    function openTuneInSearch() {
+        const tuneinUrl = 'https://tunein.com/search/';
+        const statusDiv = document.getElementById('search-status');
+
+        // *** DE NIEUWE ELECTRON LOGICA ***
+        if (typeof window.electronApi !== 'undefined' && typeof window.electronApi.openTuneinWindow !== 'undefined') {
+            
+            // Roept de Node.js backend aan om een nieuw BrowserWindow te openen
+            window.electronApi.openTuneinWindow(tuneinUrl);
+            
+            statusDiv.innerHTML = `<p class="status-message" style="color: blue;">🌐 De TuneIn zoekpagina is geopend in een **nieuw Electron-venster**. Kopieer de URL uit de adresbalk van dat nieuwe venster.</p>`;
+        } else {
+            // Fallback (oude logica voor gewone browser)
+            window.open(tuneinUrl, '_blank', 'width=800,height=600,noopener,noreferrer');
+            statusDiv.innerHTML = `<p class="status-message" style="color: blue;">🌐 Zoek de zender, kopieer de URL en plak deze in het veld.</p>`;
+        }
+    }
+
+    function processTuneInURL() {
+        const url = document.getElementById('tuneinURL').value.trim();
+        const statusDiv = document.getElementById('search-status');
+        const resultsDiv = document.getElementById('searchResults');
+        resultsDiv.innerHTML = '';
+        statusDiv.innerHTML = '';
+
+        if (!url) {
+            statusDiv.innerHTML = `<p class="status-message error-message">❌ Plak eerst een volledige TuneIn URL.</p>`;
+            return;
+        }
+        
+        // 1. Zoek de Station ID
+        const idFullMatch = url.match(/-s(\d{4,})\/?$/i); 
+        let stationId = idFullMatch ? `s${idFullMatch[1]}` : null;
+        
+        // VALIDEREN:
+        if (!stationId) {
+             statusDiv.innerHTML = `<p class="status-message error-message">❌ Geen geldige Station ID gevonden. Controleer of de URL een patroon als **-s12345/** bevat.</p>`;
+             return;
+        }
+
+        // 2. Zoek de zender naam
+        let stationName = 'Onbekende Zender';
+        const namePartWithSeparator = url.substring(0, url.indexOf(idFullMatch[0])); 
+        const rawNameMatch = namePartWithSeparator.match(/([^/]+)$/i);
+        let rawName = rawNameMatch ? rawNameMatch[1] : '';
+        const isRadioUrl = url.toLowerCase().includes('/radio/') || url.toLowerCase().includes('/station/');
+
+        if (rawName) {
+            rawName = rawName.replace(/^-+/i, '');
+            stationName = decodeURIComponent(rawName.replace(/-/g, ' ')).trim();
+            
+            stationName = stationName.split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+
+            // Voeg 'Radio' toe bij de kortere URL's
+            if (isRadioUrl && !stationName.toLowerCase().startsWith('radio') && !stationName.toLowerCase().startsWith('station')) {
+                stationName = 'Radio ' + stationName;
+            }
+        }
+        
+        // 3. Toon resultaten
+        displayResultForAssignment(stationId, stationName, resultsDiv, statusDiv);
+        document.getElementById('tuneinURL').value = ''; 
+    }
+    
+    // Functie om de geëxtraheerde ID klaar te zetten voor toewijzing
+    function displayResultForAssignment(stationId, stationName, resultsDiv, statusDiv) {
+        statusDiv.innerHTML = `<p class="status-message success-message">✅ ID: **${stationId}** geëxtraheerd. Pas de naam hieronder aan en wijs toe.</p>`;
+        
+        const editNameInput = document.createElement('input');
+        editNameInput.type = 'text';
+        editNameInput.value = stationName;
+        editNameInput.id = 'extractedStationName';
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.style.display = 'flex';
+        infoDiv.style.alignItems = 'center';
+        infoDiv.style.marginTop = '10px';
+        infoDiv.innerHTML = `<span>**ID:** ${stationId} &nbsp; **Naam:** &nbsp;</span>`;
+        infoDiv.appendChild(editNameInput);
+        
+        const assignControls = document.createElement('span');
+        assignControls.style.marginLeft = '10px';
+        assignControls.textContent = 'Toewijzen aan Preset: ';
+        
+        for (let i = 1; i <= 6; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = `${i}`;
+            btn.onclick = () => assignPresetID(i, stationId, document.getElementById('extractedStationName').value);
+            assignControls.appendChild(btn);
+        }
+        
+        resultsDiv.appendChild(infoDiv);
+        resultsDiv.appendChild(assignControls);
+    }
+
+    function assignPresetID(presetIndex, stationId, stationName) {
+        document.getElementById(`presetId${presetIndex}`).value = stationId;
+        document.getElementById(`presetName${presetIndex}`).value = stationName;
+        
+        const statusDiv = document.getElementById(`status-preset-${presetIndex}`);
+        statusDiv.innerHTML = `<p class="status-message success-message">✅ Station **${stationName}** succesvol toegewezen aan Preset ${presetIndex}. Klik nu op de **Groene Knop** om op te slaan naar de speakers.</p>`;
+        
+        document.getElementById('searchResults').innerHTML = '';
+        document.getElementById('search-status').innerHTML = '';
+    }
+
+    // --- PRESET VELDFUNCTIES ---
+
+    function createPresetFields() {
+        const container = document.getElementById('presetInputs');
+        for (let i = 1; i <= 6; i++) {
+            const div = document.createElement('div');
+            div.classList.add('preset-item');
+            div.innerHTML = `
+                <div class="preset-controls">
+                    <label for="presetId${i}">Preset ${i}:</label>
+                    <input type="text" id="presetId${i}" placeholder="Station ID (bv. s33828)" required>
+                    <input type="text" id="presetName${i}" placeholder="Naam (bv. Radio Noordzee)" value="" required> 
+                    <button onclick="savePresetToAll(${i})">Sla Preset ${i} op naar alle Speakers</button>
+                </div>
+                <div class="status-output" id="status-preset-${i}"></div>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    // --- BOSE COMMUNICATIE FUNCTIES ---
+
+    function savePresetToAll(presetId) {
+        const stationId = document.getElementById(`presetId${presetId}`).value.trim();
+        let stationName = document.getElementById(`presetName${presetId}`).value.trim();
+        const statusDiv = document.getElementById(`status-preset-${presetId}`);
+        statusDiv.innerHTML = ''; 
+        
+        if (!stationId || !stationId.startsWith('s')) {
+            statusDiv.innerHTML = `<p class="status-message error-message">❌ Fout: Vul een geldige **TuneIn Station ID** in (begint met 's').</p>`;
+            return;
+        }
+
+        if (!stationName) {
+            stationName = `Preset ${presetId} (Leeg)`; 
+        }
+
+        const contentXml = `
+          <ContentItem source="TUNEIN" type="stationurl" location="/v1/playback/station/${stationId}" sourceAccount="" isPresetable="true">
+            <itemName>${stationName}</itemName>
+            </ContentItem>`;
+
+        for (const [name, ip] of Object.entries(SPEAKERS)) {
+            storePreset(ip, name, presetId, contentXml);
+        }
+    }
+
+    async function storePreset(ip, name, presetId, contentXml) {
+        const endpoint = `http://${ip}:${BOSE_PORT}/storePreset`;
+        const statusDiv = document.getElementById(`status-preset-${presetId}`);
+        
+        const speakerStatus = document.createElement('p');
+        speakerStatus.classList.add('status-message');
+        speakerStatus.textContent = `Bezig met opslaan op ${name}...`;
+        speakerStatus.style.color = 'blue';
+        statusDiv.appendChild(speakerStatus);
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/xml' 
+                },
+                body: `<preset id="${presetId}" createdOn="${Math.floor(Date.now() / 1000)}" updatedOn="${Math.floor(Date.now() / 1000)}">${contentXml}</preset>`
+            });
+
+            if (!response.ok) {
+                // Afhandelen van HTTP-fouten (404, 500, etc.)
+                throw new Error(`HTTP fout: ${response.status}`);
+            }
+
+            speakerStatus.textContent = `✅ Preset ${presetId} succesvol opgeslagen op ${name}.`;
+            speakerStatus.classList.add('success-message');
+            speakerStatus.style.color = ''; 
+
+        } catch (error) {
+            let errorMessage = `❌ Fout bij opslaan op ${name}: ${error.message}`;
+            if (error.message.includes('Failed to fetch') || error.message.includes('HTTP fout:')) {
+                 errorMessage = `❌ Fout bij opslaan op ${name}. (Kan speaker niet bereiken op ${ip}:${BOSE_PORT}).`;
+            }
+            speakerStatus.textContent = errorMessage;
+            speakerStatus.classList.add('error-message');
+            speakerStatus.style.color = ''; 
+            console.error(`Fout bij ${name} Preset Opslaan:`, error);
+        }
+    }
+
+    // Start bij het laden van de pagina
+    createPresetFields();
+</script>
+
+</body>
+</html>
