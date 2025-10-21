@@ -11,6 +11,7 @@ to test them. This can be done with a simple extension like Access-Control-Allow
 
 The files are, of course, based on my speakers. So, if you wantg to tgest on your speakers you need to adjust the IP, Mac, and speaker ID.
 You can find that here http://IP of your speaker:8090/info
+
 Look for the lines:
 
 info deviceID=
