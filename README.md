@@ -19,4 +19,4 @@ Look for:
 Finally, I created a master SoundTouch with a WiiM mini streamer attached to it. I select presets 1 
 through 12 in the HTML and connect one or more SoundTouch slaves via the SoundTouch API. This works very well.
 
-Hope this helps and we can make a perfect controller withou their Cloud.
+Hope this helps and we can make a perfect controller without their Cloud.
