@@ -10,7 +10,7 @@ I've created several files. The ones with speaker feedback require you to disabl
 to test them. This can be done with a simple extension like Access-Control-Allow-Origin.
 
 The files are, of course, based on my speakers. So, if you wantg to tgest on your speakers you need to adjust the IP, Mac, and speaker ID.
-You can find that here http://<IP of your speaker>:8090/info
+You can find that here http://IP of your speaker:8090/info
 Look for the lines:
 
 info deviceID=
