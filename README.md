@@ -13,8 +13,8 @@ The files are, of course, based on my speakers. So, if you wantg to tgest on you
 You can find that here http://<IP of your speaker>:8090/info
 Look for:
 info deviceID=
-<macAddress>
-<ipAddress>
+macAddress
+ipAddress
 
 Finally, I created a master SoundTouch with a WiiM mini streamer attached to it. I select presets 1 
 through 12 in the HTML and connect one or more SoundTouch slaves via the SoundTouch API. This works very well.
