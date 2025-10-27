@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose SoundTouch Configurator V12 (Bas + ST300 Niveaus + Aan/Uit)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .speaker-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .speaker-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #00a4ff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .control-group:last-child {
+            border-bottom: none; 
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .control-value {
+            font-weight: bold;
+            color: #00a4ff;
+            margin-left: 10px;
+        }
+        input[type=range] {
+            width: 100%;
+        }
+        /* Nieuwe CSS voor de AAN/UIT knoppen */
+        .on-off-toggle {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .on-off-button {
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-grow: 1;
+            text-align: center;
+            font-weight: bold;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .on-off-button.on {
+            background-color: #4CAF50; /* Groen */
+            color: white;
+            border-color: #4CAF50;
+        }
+        .on-off-button.off {
+            background-color: #f44336; /* Rood */
+            color: white;
+            border-color: #f44336;
+        }
+        .on-off-button.active {
+            box-shadow: 0 0 0 3px rgba(0, 164, 255, 0.5); /* Blauwe gloed */
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        .feedback-status {
+            font-weight: bold;
+            color: #008000;
+        }
+        .error {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .refresh-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SoundTouch Extra Configuratie</h1>
+    <p class="refresh-info">De status van de **Bas**, **ST300 Niveaus** en **ST300 Aan/Uit** wordt elke 2 seconden automatisch ververst. ??</p>
+    <div class="container">
+        
+        <div class="speaker-box" id="speaker-Woonkamer">
+            <h3>Woonkamer (Soundtouch 300)</h3>
+            
+            <div class="control-group level-control">
+                <label for="level-Woonkamer-center">Midden Niveau (-10 t/m +10): <span id="level-Woonkamer-center-value" class="control-value">0</span></label>
+                <input type="range" id="level-Woonkamer-center" min="-10" max="10" value="0" step="1" data-ip="192.168.1.50" data-room="Woonkamer" data-type="center">
+            </div>
+
+            <div class="control-group level-control">
+                <label for="level-Woonkamer-surround">Surround Niveau (-10 t/m +10): <span id="level-Woonkamer-surround-value" class="control-value">0</span></label>
+                <input type="range" id="level-Woonkamer-surround" min="-10" max="10" value="0" step="1" data-ip="192.168.1.50" data-room="Woonkamer" data-type="surround">
+            </div>
+
+            <div class="control-group toggle-control">
+                <label>Bass Module Status:</label>
+                <div class="on-off-toggle">
+                    <button id="toggle-Woonkamer-subwoofer-on" class="on-off-button" data-ip="192.168.1.50" data-type="subwoofer" data-status="true">AAN</button>
+                    <button id="toggle-Woonkamer-subwoofer-off" class="on-off-button" data-ip="192.168.1.50" data-type="subwoofer" data-status="false">UIT</button>
+                </div>
+            </div>
+
+            <div class="control-group toggle-control">
+                <label>Surround Speakers Status:</label>
+                <div class="on-off-toggle">
+                    <button id="toggle-Woonkamer-rear-on" class="on-off-button" data-ip="192.168.1.50" data-type="rear" data-status="true">AAN</button>
+                    <button id="toggle-Woonkamer-rear-off" class="on-off-button" data-ip="192.168.1.50" data-type="rear" data-status="false">UIT</button>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback-Woonkamer">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Keuken">
+            <h3>Keuken (Soundtouch 20)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Keuken">Bas Niveau (-9 t/m 0): <span id="bass-Keuken-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Keuken" min="-9" max="0" value="0" step="1" data-ip="192.168.1.51" data-room="Keuken" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Keuken">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Inloopkast">
+            <h3>Inloopkast (Soundtouch 10)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Inloopkast">Bas Niveau (-9 t/m 0): <span id="bass-Inloopkast-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Inloopkast" min="-9" max="0" value="0" step="1" data-ip="192.168.1.52" data-room="Inloopkast" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Inloopkast">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Achtertuin">
+            <h3>Achtertuin (Soundtouch 10)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Achtertuin">Bas Niveau (-9 t/m 0): <span id="bass-Achtertuin-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Achtertuin" min="-9" max="0" value="0" step="1" data-ip="192.168.1.53" data-room="Achtertuin" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Achtertuin">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Garage">
+            <h3>Garage (Soundtouch 20)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Garage">Bas Niveau (-9 t/m 0): <span id="bass-Garage-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Garage" min="-9" max="0" value="0" step="1" data-ip="192.168.1.54" data-room="Garage" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Garage">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Hobbyzolder">
+            <h3>Hobbyzolder (Soundtouch 20)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Hobbyzolder">Bas Niveau (-9 t/m 0): <span id="bass-Hobbyzolder-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Hobbyzolder" min="-9" max="0" value="0" step="1" data-ip="192.168.1.55" data-room="Hobbyzolder" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Hobbyzolder">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuratie ---
+        const SPEAKERS = [
+            { room: 'Woonkamer', ip: '192.168.1.50', model: 'Soundtouch 300', hasBassControl: false }, 
+            { room: 'Keuken', ip: '192.168.1.51', model: 'Soundtouch 20', hasBassControl: true },
+            { room: 'Inloopkast', ip: '192.168.1.52', model: 'Soundtouch 10', hasBassControl: true },
+            { room: 'Achtertuin', ip: '192.168.1.53', model: 'Soundtouch 10', hasBassControl: true },
+            { room: 'Garage', ip: '192.168.1.54', model: 'Soundtouch 20', hasBassControl: true },
+            { room: 'Hobbyzolder', ip: '192.168.1.55', model: 'Soundtouch 20', hasBassControl: true },
+        ];
+        
+        const isDragging = {}; 
+        const API_TIMEOUT = 2500; 
+        const ST300_LEVELS_ENDPOINT = '/audioproductlevelcontrols';
+        const ST300_SPEAKER_ENDPOINT = '/audiospeakerattributeandsetting'; // Nieuwe endpoint
+
+        // --- Hulpfuncties ---
+        function getRoomByIp(ip) {
+            const speaker = SPEAKERS.find(s => s.ip === ip);
+            return speaker ? speaker.room : 'Onbekend';
+        }
+
+        function updateFeedback(element, message, type) {
+            if (!element) return;
+            const statusSpan = element.querySelector('.feedback-status');
+            if (!statusSpan) return;
+
+            statusSpan.textContent = message;
+            
+            if (type === 'error') {
+                statusSpan.className = 'feedback-status error';
+            } else if (type === 'success') {
+                statusSpan.className = 'feedback-status success';
+            } else {
+                statusSpan.className = 'feedback-status';
+            }
+        }
+
+        function updateToggleButton(room, type, status) {
+            const onButton = document.getElementById(`toggle-${room}-${type}-on`);
+            const offButton = document.getElementById(`toggle-${room}-${type}-off`);
+
+            if (onButton) onButton.classList.remove('active', 'on', 'off');
+            if (offButton) offButton.classList.remove('active', 'on', 'off');
+
+            if (status === true || status === 'true') {
+                if (onButton) onButton.classList.add('active', 'on');
+            } else if (status === false || status === 'false') {
+                if (offButton) offButton.classList.add('active', 'off');
+            }
+        }
+        
+        // --- API Functies: BAS (ST10/20) ---
+        
+        async function getBass(ip) {
+            const url = `http://${ip}:8090/bass`; 
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const bassNode = xmlDoc.getElementsByTagName("actualbass")[0]; 
+                if (bassNode && bassNode.textContent) {
+                    const bassLevel = parseInt(bassNode.textContent, 10);
+                    updateFeedback(feedbackElement, `Laatste status opgehaald`, 'success'); 
+                    return bassLevel;
+                } else {
+                    throw new Error("Geen of lege 'actualbass' tag gevonden.");
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen bas', 'error');
+                } else if (error.message.includes('404')) {
+                    updateFeedback(feedbackElement, 'Basregeling niet ondersteund', 'default'); 
+                } else {
+                    updateFeedback(feedbackElement, `Fout bij ophalen bas: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        async function setBass(ip, level) {
+            const url = `http://${ip}:8090/bass`; 
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            const xmlBody = `<bass>${level}</bass>`;
+            
+            updateFeedback(feedbackElement, `Bas instellen op ${level}...`, 'loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `Bas succesvol ingesteld op ${level}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`Fout bij instellen bas voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen bas: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+        
+        // --- API Functies: ST300 Niveaus ---
+
+        /** Haalt de actuele midden- en surroundniveaus op. */
+        async function getST300Levels(ip) {
+            const url = `http://${ip}:8090${ST300_LEVELS_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const centerNode = xmlDoc.querySelector('frontCenterSpeakerLevel');
+                const surroundNode = xmlDoc.querySelector('rearSurroundSpeakersLevel');
+
+                if (centerNode && surroundNode) {
+                    const centerLevelAPI = parseInt(centerNode.getAttribute('value'), 10) || 0;
+                    const surroundLevelAPI = parseInt(surroundNode.getAttribute('value'), 10) || 0;
+                    
+                    // Converteer van API schaal (-100 tot +100) naar App schaal (-10 tot +10)
+                    const centerLevelApp = Math.round(centerLevelAPI / 10);
+                    const surroundLevelApp = Math.round(surroundLevelAPI / 10);
+
+                    updateFeedback(feedbackElement, `Niveaus opgehaald.`, 'success');
+                    return { center: centerLevelApp, surround: surroundLevelApp };
+                } else {
+                    throw new Error("Midden/Surround tags niet gevonden in API antwoord.");
+                }
+
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen niveaus', 'error');
+                } else if (!error.message.includes('404')) {
+                    updateFeedback(feedbackElement, `Fout bij ophalen niveaus: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        /** Stelt de midden- en surroundniveaus in. */
+        async function setST300Levels(ip, centerLevelApp, surroundLevelApp) {
+            const url = `http://${ip}:8090${ST300_LEVELS_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            // Converteer van App schaal (-10 tot +10) naar API schaal (-100 tot +100)
+            const centerLevelApi = centerLevelApp * 10;
+            const surroundLevelApi = surroundLevelApp * 10;
+
+            const xmlBody = 
+                `<audioproductlevelcontrols>
+                    <frontCenterSpeakerLevel value="${centerLevelApi}" />
+                    <rearSurroundSpeakersLevel value="${surroundLevelApi}" />
+                </audioproductlevelcontrols>`;
+
+            updateFeedback(feedbackElement, `Niveaus instellen...`, 'loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `Niveaus succesvol ingesteld op C:${centerLevelApp}, S:${surroundLevelApp}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`Fout bij instellen ST300 niveaus:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen niveaus: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+
+        // --- NIEUWE API Functies: ST300 Luidspreker Aan/Uit ---
+
+        /** Haalt de actuele subwoofer en rear speaker status op (AAN/UIT). */
+        async function getST300SpeakerStatus(ip) {
+            const url = `http://${ip}:8090${ST300_SPEAKER_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const rearNode = xmlDoc.querySelector('rear');
+                const subNode = xmlDoc.querySelector('subwoofer01');
+
+                if (rearNode && subNode) {
+                    // Attributen 'active' zijn 'true' of 'false' (string)
+                    const rearStatus = rearNode.getAttribute('active') === 'true';
+                    const subStatus = subNode.getAttribute('active') === 'true';
+
+                    updateFeedback(feedbackElement, `Status opgehaald.`, 'success');
+                    return { rear: rearStatus, subwoofer: subStatus };
+                } else {
+                    throw new Error("Luidspreker status tags niet gevonden in API antwoord.");
+                }
+
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen status', 'error');
+                } else if (!error.message.includes('404')) {
+                    updateFeedback(feedbackElement, `Fout bij ophalen status: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        /** Stelt de status (AAN/UIT) van een luidspreker in. */
+        async function setST300SpeakerStatus(ip, type, status) {
+            const url = `http://${ip}:8090${ST300_SPEAKER_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+
+            // Vraag de huidige status op om de NIET-gewijzigde luidspreker in de XML te behouden
+            let currentStatuses;
+            try {
+                currentStatuses = await getST300SpeakerStatus(ip);
+            } catch (e) {
+                // Als ophalen mislukt, neem aan dat de andere status de huidige instelling is
+                currentStatuses = {
+                    rear: type === 'rear' ? status : true, // Bij twijfel, laat de andere AAN staan (of een veilige default)
+                    subwoofer: type === 'subwoofer' ? status : true
+                };
+            }
+
+            const newRearStatus = type === 'rear' ? status : currentStatuses.rear.toString();
+            const newSubStatus = type === 'subwoofer' ? status : currentStatuses.subwoofer.toString();
+
+            const xmlBody = 
+                `<audiospeakerattributeandsetting>
+                    <rear active="${newRearStatus}" />
+                    <subwoofer01 active="${newSubStatus}" />
+                </audiospeakerattributeandsetting>`;
+
+            updateFeedback(feedbackElement, `${type} instellen op ${status}...`, 'loading');
+            updateToggleButton(getRoomByIp(ip), type, status);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `${type} succesvol ingesteld op ${status}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`Fout bij instellen ST300 status:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen ${type}: ${error.message.substring(0, 40)}`, 'error');
+                
+                // Update de knop om de oude status (of neutrale) weer te geven na fout
+                if (currentStatuses) {
+                    updateToggleButton(getRoomByIp(ip), 'rear', currentStatuses.rear);
+                    updateToggleButton(getRoomByIp(ip), 'subwoofer', currentStatuses.subwoofer);
+                } else {
+                    updateToggleButton(getRoomByIp(ip), type, null); // Neutraal als onbekend
+                }
+            }
+        }
+
+        // --- Verversingslogica ---
+
+        /** Haalt de actuele basinstelling op en werkt de slider bij. (Bestand) */
+        async function updateBassSliderFromAPI(slider) {
+            const ip = slider.dataset.ip;
+            const room = slider.dataset.room;
+            const valueDisplay = document.getElementById(`bass-${room}-value`);
+            
+            if (isDragging[`${room}-bass`]) return; 
+            
+            try {
+                const currentBass = await getBass(ip);
+                if (slider.value !== currentBass.toString()) {
+                    slider.value = currentBass; 
+                    valueDisplay.textContent = currentBass;
+                }
+            } catch (e) {
+                if (e.message.includes('404')) {
+                    const box = document.getElementById(`speaker-${room}`);
+                    if (box) {
+                        const bassControl = box.querySelector('.bass-control');
+                        if (bassControl) bassControl.style.display = 'none'; 
+                    }
+                }
+            }
+        }
+
+        /** Haalt de actuele ST300 niveaus op en werkt de sliders bij. (Bestand) */
+        async function updateST300SlidersFromAPI(ip) {
+            const room = getRoomByIp(ip);
+            const centerSlider = document.getElementById(`level-${room}-center`);
+            const surroundSlider = document.getElementById(`level-${room}-surround`);
+            const centerValueDisplay = document.getElementById(`level-${room}-center-value`);
+            const surroundValueDisplay = document.getElementById(`level-${room}-surround-value`);
+
+            if (isDragging[`${room}-center`] || isDragging[`${room}-surround`]) return;
+
+            try {
+                const levels = await getST300Levels(ip);
+                
+                if (centerSlider.value !== levels.center.toString()) {
+                    centerSlider.value = levels.center;
+                    centerValueDisplay.textContent = levels.center;
+                }
+                if (surroundSlider.value !== levels.surround.toString()) {
+                    surroundSlider.value = levels.surround;
+                    surroundValueDisplay.textContent = levels.surround;
+                }
+            } catch (e) {
+                // Foutafhandeling voor ST300 niveaus
+            }
+        }
+
+        /** NIEUW: Haalt de actuele ST300 speaker status op en werkt de knoppen bij. */
+        async function updateST300SwitchesFromAPI(ip) {
+            const room = getRoomByIp(ip);
+            try {
+                const statuses = await getST300SpeakerStatus(ip);
+                updateToggleButton(room, 'subwoofer', statuses.subwoofer);
+                updateToggleButton(room, 'rear', statuses.rear);
+            } catch (e) {
+                // Foutafhandeling voor ST300 status
+            }
+        }
+
+
+        function startAutoRefresh() {
+            const allSliders = document.querySelectorAll('input[type="range"][data-ip]');
+            
+            const fullRefresh = () => {
+                let st300Ip = null;
+                
+                allSliders.forEach(slider => {
+                    if (slider.dataset.type === 'bass') {
+                        updateBassSliderFromAPI(slider);
+                    }
+                    if (slider.dataset.room === 'Woonkamer' && slider.dataset.ip) {
+                        st300Ip = slider.dataset.ip;
+                    }
+                });
+
+                if (st300Ip) {
+                    // ST300 niveaus en Aan/Uit worden apart opgehaald
+                    updateST300SlidersFromAPI(st300Ip);
+                    updateST300SwitchesFromAPI(st300Ip); // NIEUW
+                }
+            };
+
+            fullRefresh();
+            setInterval(fullRefresh, 2000); 
+        }
+
+        // --- Initialisatie ---
+        function initialize() {
+            const allSliders = document.querySelectorAll('input[type="range"][data-ip]');
+            const allToggleButtons = document.querySelectorAll('.on-off-toggle button'); // NIEUW
+
+            
+            // Initialisatie voor sliders
+            for (const slider of allSliders) {
+                const room = slider.dataset.room;
+                const type = slider.dataset.type; 
+                const key = `${room}-${type}`;
+                const ip = slider.dataset.ip;
+                
+                let valueDisplayId = (type === 'bass') ? `bass-${room}-value` : `level-${room}-${type}-value`;
+                const valueDisplay = document.getElementById(valueDisplayId);
+
+                isDragging[key] = false;
+
+                slider.addEventListener('input', (event) => {
+                    isDragging[key] = true;
+                    if (valueDisplay) valueDisplay.textContent = event.target.value;
+                });
+
+                slider.addEventListener('change', (event) => {
+                    isDragging[key] = false;
+                    const newLevel = parseInt(event.target.value, 10);
+                    
+                    if (type === 'bass') {
+                        setBass(ip, newLevel);
+                    } else if (room === 'Woonkamer' && (type === 'center' || type === 'surround')) {
+                        const centerSlider = document.getElementById(`level-${room}-center`);
+                        const surroundSlider = document.getElementById(`level-${room}-surround`);
+                        
+                        const currentCenter = parseInt(centerSlider.value, 10);
+                        const currentSurround = parseInt(surroundSlider.value, 10);
+
+                        const newCenter = (type === 'center') ? newLevel : currentCenter;
+                        const newSurround = (type === 'surround') ? newLevel : currentSurround;
+
+                        setST300Levels(ip, newCenter, newSurround);
+                    }
+                });
+                
+                // Initiele feedback instellen (voor alle speakers)
+                const feedbackElement = document.getElementById(`feedback-${room}`);
+                updateFeedback(feedbackElement, 'Laden...', 'default');
+            }
+
+            // NIEUW: Initialisatie voor toggle knoppen (alleen Woonkamer)
+            for (const button of allToggleButtons) {
+                button.addEventListener('click', (event) => {
+                    const ip = event.target.dataset.ip;
+                    const type = event.target.dataset.type; // 'subwoofer' of 'rear'
+                    const status = event.target.dataset.status; // 'true' of 'false'
+
+                    setST300SpeakerStatus(ip, type, status);
+                });
+            }
+            
+            // Start de periodieke verversing
+            startAutoRefresh();
+        }
+
+        window.addEventListener('load', initialize);
+    </script>
+
+</body>
+</html>
