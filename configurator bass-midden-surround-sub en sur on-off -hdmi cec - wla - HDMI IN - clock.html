@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bose SoundTouch Configurator V24 (Klok + WLA Sync)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .speaker-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .speaker-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* UPDATED STIJL: Woonkamer box 2 kolommen breed */
+        #speaker-Woonkamer {
+            grid-column: span 2;
+        }
+        
+        /* NIEUWE STIJL: Container voor de twee interne kolommen in Woonkamer */
+        .st300-content-flex {
+            display: flex;
+            gap: 20px; /* Ruimte tussen de twee kolommen */
+        }
+
+        /* NIEUWE STIJL: Linker kolom (Bas/Niveaus/CEC) */
+        #speaker-Woonkamer .main-controls-wrapper {
+            flex: 2; /* Maakt de linker kolom iets breder dan de rechter */
+            padding-right: 10px;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        /* NIEUWE STIJL: Rechter kolom (HDMI IN/Delay) */
+        #speaker-Woonkamer .hdmi-controls-wrapper {
+            flex: 1.2; /* Houdt de rechter kolom compacter */
+            padding-left: 10px;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #00a4ff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* NIEUWE STIJL: Sub-heading voor HDMI IN sectie */
+        .hdmi-controls-wrapper h4 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #0056b3; 
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 3px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .control-group:last-child {
+            border-bottom: none; 
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .control-value {
+            font-weight: bold;
+            color: #00a4ff; /* Standaard kleur voor waardes */
+            margin-left: 10px;
+        }
+        /* Specifieke kleur voor WLA sync delay en HDMI Delay */
+        #delayValue-SoundtouchWLA, #delayValueDisplay {
+            color: #f44336; /* Rood */
+        }
+        input[type=range] {
+            width: 100%;
+        }
+        /* CSS voor de AAN/UIT knoppen */
+        .on-off-toggle {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .on-off-button {
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-grow: 1;
+            text-align: center;
+            font-weight: bold;
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        /* HDMI Toggle Button Specifieke Stijlen */
+        #masterToggle {
+            background-color: #00a4ff; /* Standaard kleur voor AAN/Selecteer */
+            color: white;
+            flex-grow: 1;
+            width: 100%;
+        }
+        #masterToggle.active-on { /* HDMI IN is ON (Tekst wordt UIT, knop wordt Rood) */
+            background-color: #f44336; 
+            border-color: #f44336;
+        }
+        #masterToggle.active-on:hover:not(:disabled) {
+            background-color: #d32f2f;
+        }
+        #masterToggle:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Stijlen voor de bestaande Sub/Rear knoppen */
+        .on-off-button.on {
+            background-color: #4CAF50; /* Groen */
+            color: white;
+            border-color: #4CAF50;
+        }
+        .on-off-button.off {
+            background-color: #f44336; /* Rood */
+            color: white;
+            border-color: #f44336;
+        }
+        .on-off-button.active {
+            box-shadow: 0 0 0 3px rgba(0, 164, 255, 0.5); /* Blauwe gloed */
+        }
+        .on-off-button:not(.active):hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        .feedback-status {
+            font-weight: bold;
+            color: #008000;
+        }
+        .error {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .refresh-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        /* Stijl voor CEC feedback (zichtbaar bij fouten, anders verborgen) */
+        #feedback-cec-Woonkamer {
+            min-height: 1.2em; 
+            box-sizing: border-box;
+            line-height: 1.2;
+        }
+        
+        /* --- NIEUW: STIJL VOOR KLOK SLIDER CONTROLE --- */
+        .control-group.clock-control {
+            border-top: 1px solid #f0f0f0; 
+            padding-top: 15px; 
+            margin-top: 15px;
+            margin-bottom: 5px; 
+        }
+        .control-group.clock-control label {
+            margin-bottom: 5px; 
+            font-weight: normal; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .control-group.clock-control .on-off-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* De Stijl van de Toggle Switch (Slider) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px; 
+            height: 25px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border-radius: 50px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 50px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; 
+            width: 20px; 
+            left: 2.5px; 
+            bottom: 2.5px; 
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50; 
+        }
+        input:checked + .slider:before {
+            transform: translateX(25px); 
+        }
+
+        /* Status en Label naast de slider */
+        .status-text {
+            font-size: 16px; 
+            line-height: 25px; 
+            vertical-align: middle;
+            font-weight: bold;
+            color: #333; 
+        }
+        /* EINDE KLOK STIJL */
+
+
+    </style>
+</head>
+<body onload="initialize()">
+
+    <h1>SoundTouch Extra Configuratie</h1>
+    <p class="refresh-info">De status van de **Bas**, **WLA Vertraging**, **ST300 Niveaus**, **ST300 Aan/Uit**, **CEC**, **HDMI IN** en **Klok** wordt elke 2 seconden automatisch ververst. **Controleer de browserconsole (F12) bij fouten!**</p>
+    <div class="container">
+        
+        <div class="speaker-box" id="speaker-Woonkamer">
+            <h3>Woonkamer (Soundtouch 300)</h3>
+            <div class="st300-content-flex">
+                <div class="main-controls-wrapper"> 
+                    
+                    <div class="control-group level-control">
+                        <label for="level-Woonkamer-center">Midden Niveau (-10 t/m +10): <span id="level-Woonkamer-center-value" class="control-value">0</span></label>
+                        <input type="range" id="level-Woonkamer-center" min="-10" max="10" value="0" step="1" data-room="Woonkamer" data-type="center">
+                    </div>
+
+                    <div class="control-group level-control">
+                         <label for="level-Woonkamer-surround">Surround Niveau (-10 t/m +10): <span id="level-Woonkamer-surround-value" class="control-value">0</span></label>
+                        <input type="range" id="level-Woonkamer-surround" min="-10" max="10" value="0" step="1" data-room="Woonkamer" data-type="surround">
+                    </div>
+
+                    <div class="control-group toggle-control">
+                        <label>Bass Module Status:</label>
+                        <div class="on-off-toggle">
+                            <button id="toggle-Woonkamer-subwoofer-on" class="on-off-button" data-type="subwoofer" data-status="true">AAN</button>
+                            <button id="toggle-Woonkamer-subwoofer-off" class="on-off-button" data-type="subwoofer" data-status="false">UIT</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group toggle-control">
+                        <label>Surround Speakers Status:</label>
+                        <div class="on-off-toggle">
+                            <button id="toggle-Woonkamer-rear-on" class="on-off-button" data-type="rear" data-status="true">AAN</button>
+                            <button id="toggle-Woonkamer-rear-off" class="on-off-button" data-type="rear" data-status="false">UIT</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group level-control" style="margin-top: 20px;">
+                         <label for="hdmiCecMode-Woonkamer">HDMI-CEC Instelling:</label>
+                        <select id="hdmiCecMode-Woonkamer" data-room="Woonkamer" onchange="setHdmiCecMode(this)">
+                            <option value="CEC_MODE_ON">Standaard aan (CEC_MODE_ON)</option>
+                            <option value="CEC_MODE_ALTERNATE">Alternatief aan (CEC_MODE_ALTERNATE)</option>
+                            <option value="CEC_MODE_OFF">Uit (CEC_MODE_OFF)</option>
+                        </select>
+                        <div id="feedback-cec-Woonkamer" class="feedback" style="margin-top: 5px; padding: 0; border: none; font-style: italic;"></div>
+                    </div>
+
+                    <div class="feedback" id="feedback-Woonkamer">
+                        Status: <span class="feedback-status">Laden...</span>
+                    </div>
+                </div>
+
+                <div class="hdmi-controls-wrapper">
+                    <h4>HDMI IN / Audio Delay</h4>
+
+                    <div class="control-group toggle-control">
+                        <button 
+                            id="masterToggle" 
+                            class="on-off-button"
+                            disabled>
+                            Schakelen...
+                        </button>
+                    </div>
+
+                    <div class="control-group level-control" style="border-bottom: none;">
+                        <label id="sliderLabel" for="delaySlider" style="margin-bottom: 5px; font-weight: normal;">
+                            Audiovertraging: <span id="delayValueDisplay" class="control-value">0</span> ms (0-250)
+                        </label>
+                        
+                        <input 
+                            type="range" 
+                            min="0" 
+                            max="250" 
+                            value="0" 
+                            id="delaySlider" 
+                            step="1"
+                            disabled>
+                        
+                        <p id="sliderStatus" class="error" style="font-size: 0.8em; margin-top: 5px; display: none;"></p>
+                    </div>
+
+                    <div id="errorLog-hdmi" class="error" style="padding: 5px; border: 1px solid #ff0000; margin-top: 10px; display: none; font-size: 0.9em;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Keuken">
+            <h3>Keuken (Soundtouch 20)</h3>
+            
+            <div class="control-group clock-control">
+                <label>Klok Display:</label>
+                <div class="on-off-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="klokToggle-Keuken" data-room="Keuken" onchange="setClockStatus(this.dataset.ip, this.checked, this.dataset.room)">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="status-text" id="status-display-Keuken">... Laden ...</span>
+                </div>
+            </div>
+            <div class="control-group bass-control">
+                <label for="bass-Keuken">Bas Niveau (-9 t/m 0): <span id="bass-Keuken-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Keuken" min="-9" max="0" value="0" step="1" data-ip="192.168.1.51" data-room="Keuken" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Keuken">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+        
+        <div class="speaker-box" id="speaker-Achtertuin">
+            <h3>Achtertuin (Soundtouch 10)</h3>
+
+            <div class="control-group bass-control">
+                <label for="bass-Achtertuin">Bas Niveau (-9 t/m 0): <span id="bass-Achtertuin-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Achtertuin" min="-9" max="0" value="0" step="1" data-ip="192.168.1.52" data-room="Achtertuin" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Achtertuin">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Nieuwe">
+            <h3>Nieuwe (Soundtouch 20)</h3>
+            
+            <div class="control-group clock-control">
+                <label>Klok Display:</label>
+                <div class="on-off-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="klokToggle-Nieuwe" data-room="Nieuwe" onchange="setClockStatus(this.dataset.ip, this.checked, this.dataset.room)">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="status-text" id="status-display-Nieuwe">... Laden ...</span>
+                </div>
+            </div>
+            <div class="control-group bass-control">
+                <label for="bass-Nieuwe">Bas Niveau (-9 t/m 0): <span id="bass-Nieuwe-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Nieuwe" min="-9" max="0" value="0" step="1" data-ip="192.168.1.53" data-room="Nieuwe" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Nieuwe">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Garage">
+            <h3>Garage (Soundtouch 20)</h3>
+            
+            <div class="control-group clock-control">
+                <label>Klok Display:</label>
+                <div class="on-off-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="klokToggle-Garage" data-room="Garage" onchange="setClockStatus(this.dataset.ip, this.checked, this.dataset.room)">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="status-text" id="status-display-Garage">... Laden ...</span>
+                </div>
+            </div>
+            <div class="control-group bass-control">
+                <label for="bass-Garage">Bas Niveau (-9 t/m 0): <span id="bass-Garage-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Garage" min="-9" max="0" value="0" step="1" data-ip="192.168.1.54" data-room="Garage" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Garage">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-Hobbyzolder">
+            <h3>Hobbyzolder (Soundtouch 20)</h3>
+            
+            <div class="control-group clock-control">
+                <label>Klok Display:</label>
+                <div class="on-off-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="klokToggle-Hobbyzolder" data-room="Hobbyzolder" onchange="setClockStatus(this.dataset.ip, this.checked, this.dataset.room)">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="status-text" id="status-display-Hobbyzolder">... Laden ...</span>
+                </div>
+            </div>
+            <div class="control-group bass-control">
+                <label for="bass-Hobbyzolder">Bas Niveau (-9 t/m 0): <span id="bass-Hobbyzolder-value" class="control-value">0</span></label>
+                <input type="range" id="bass-Hobbyzolder" min="-9" max="0" value="0" step="1" data-ip="192.168.1.55" data-room="Hobbyzolder" data-type="bass">
+            </div>
+            
+            <div class="feedback" id="feedback-Hobbyzolder">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+
+        <div class="speaker-box" id="speaker-SoundtouchWLA">
+            <h3>Soundtouch WLA (Wireless Link Adapter)</h3>
+            
+            <div class="control-group level-control">
+                <label for="delayRange-SoundtouchWLA">
+                    Audio Vertraging (ms) (-20 t/m +130): 
+                    <span id="delayValue-SoundtouchWLA" class="control-value">Laden...</span> ms
+                </label>
+                <input type="range" id="delayRange-SoundtouchWLA" min="-20" max="130" value="0" step="10" 
+                       data-ip="192.168.1.57" data-room="SoundtouchWLA" data-type="sync">
+            </div>
+            
+            <div class="feedback" id="feedback-SoundtouchWLA">
+                Status: <span class="feedback-status">Laden...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuratie ---
+        const SPEAKERS = [
+            // Dit is de ENIGE plek waar IP's nu gewijzigd hoeven te worden
+            { room: 'Woonkamer', ip: '192.168.1.50', model: 'Soundtouch 300', hasBassControl: false }, 
+            { room: 'Keuken', ip: '192.168.1.51', model: 'Soundtouch 20', hasBassControl: true },
+            { room: 'Achtertuin', ip: '192.168.1.52', model: 'Soundtouch 10', hasBassControl: true }, 
+            // 'Nieuwe' is hier ook als ST20 behandeld, zoals gevraagd.
+            { room: 'Nieuwe', ip: '192.168.1.53', model: 'Soundtouch 20', hasBassControl: true }, 
+            { room: 'Garage', ip: '192.168.1.54', model: 'Soundtouch 20', hasBassControl: true },
+            { room: 'Hobbyzolder', ip: '192.168.1.55', model: 'Soundtouch 20', hasBassControl: true },
+            { room: 'SoundtouchWLA', ip: '192.168.1.57', model: 'Wireless Link Adapter', hasBassControl: false, hasSyncControl: true },
+        ];
+        
+        // NIEUW: Configuratie voor Klok Display
+        const CLOCK_FIXED_ATTRIBUTES = {
+            timezoneInfo: "Europe/Amsterdam",
+            timeFormat: "TIME_FORMAT_24HOUR_ID",
+            userOffsetMinute: "0",
+            brightnessLevel: "70",
+            userUtcTime: "0"
+        };
+        const CLOCK_ROOMS = ['Keuken', 'Nieuwe', 'Garage', 'Hobbyzolder'];
+
+        // NIEUW: Haalt de ST300 IP dynamisch op uit de SPEAKERS array.
+        function getSt300Ip() {
+            const st300Speaker = SPEAKERS.find(s => s.room === 'Woonkamer');
+            return st300Speaker ? st300Speaker.ip : null;
+        }
+
+        const ST300_IP = getSt300Ip();
+        
+        const isDragging = {}; 
+        const API_TIMEOUT = 2500; 
+        const ST300_LEVELS_ENDPOINT = '/audioproductlevelcontrols';
+        const ST300_SPEAKER_ENDPOINT = '/audiospeakerattributeandsetting'; 
+        const ST300_CEC_ENDPOINT = '/productcechdmicontrol'; 
+        const WLA_SYNC_ENDPOINT = '/OutputLatency'; 
+        
+        const API_PORT = 8090;
+
+        const CEC_MODE_MAPPING = {
+            'CEC_MODE_ON': 'Standaard aan (CEC_MODE_ON)',
+            'CEC_MODE_ALTERNATE': 'Alternatief aan (CEC_MODE_ALTERNATE)',
+            'CEC_MODE_OFF': 'Uit (CEC_MODE_OFF)'
+        };
+        
+        // NIEUW: UI object en state voor HDMI IN controls
+        let isHdmiInActive = false;
+        const hdmiInUi = {
+            toggleButton: null,
+            delaySlider: null,
+            delayDisplay: null,
+            sliderLabel: null,
+            sliderStatus: null,
+            errorLog: null
+        };
+
+
+        // --- Hulpfuncties ---
+        function getRoomByIp(ip) {
+            const speaker = SPEAKERS.find(s => s.ip === ip);
+            return speaker ? speaker.room : 'Onbekend';
+        }
+
+        function updateFeedback(element, message, type) {
+            if (!element) return;
+            let statusSpan = element.querySelector('.feedback-status');
+            
+            if (element.id.startsWith('feedback-cec-') && type === 'success') {
+                element.textContent = '';
+                return;
+            }
+
+            if (!statusSpan) {
+                element.textContent = message;
+                element.style.color = type === 'error' ? '#ff0000' : (type === 'success' ? '#008000' : '#333');
+                return;
+            }
+
+            statusSpan.textContent = message;
+            
+            if (type === 'error') {
+                statusSpan.className = 'feedback-status error';
+            } else if (type === 'success') {
+                statusSpan.className = 'feedback-status success';
+            } else {
+                statusSpan.className = 'feedback-status';
+            }
+        }
+
+        function updateToggleButton(room, type, status) {
+            const onButton = document.getElementById(`toggle-${room}-${type}-on`);
+            const offButton = document.getElementById(`toggle-${room}-${type}-off`);
+
+            if (onButton) onButton.classList.remove('active', 'on', 'off');
+            if (offButton) offButton.classList.remove('active', 'on', 'off');
+
+            if (status === true || status === 'true') {
+                if (onButton) onButton.classList.add('active', 'on');
+            } else if (status === false || status === 'false') {
+                if (offButton) offButton.classList.add('active', 'off');
+            }
+        }
+
+        // --- NIEUWE HDMI IN HULP & API FUNCTIES (ongewijzigd) ---
+        // ... (Alle HDMI functies, inclusief logError, clearError, sendPostRequest, toggleHDMIStatus, 
+        // setDelay, updateHDMIInUIStatus, updateToggleUI, updateSliderUI, updateDelayDisplay) blijven ongewijzigd ...
+        // [Omwille van de leesbaarheid van dit antwoord, zijn deze lange, ongewijzigde functies hier weggelaten]
+        
+        function logError(message) {
+            console.error(message);
+            if (hdmiInUi.errorLog) {
+                hdmiInUi.errorLog.textContent = `Fout: ${message}`;
+                hdmiInUi.errorLog.style.display = 'block';
+            }
+        }
+
+        function clearError() {
+            if (hdmiInUi.errorLog) {
+                hdmiInUi.errorLog.style.display = 'none';
+                hdmiInUi.errorLog.textContent = '';
+            }
+        }
+        
+        // Gebruikt de dynamisch ingestelde ST300_IP
+        function sendPostRequest(path, xmlBody, actionText) {
+            if (!ST300_IP) {
+                logError("Kan niet verbinden: ST300 IP is niet ingesteld.");
+                return Promise.resolve(false);
+            }
+            clearError();
+            const url = `http://${ST300_IP}:${API_PORT}${path}`;
+            
+            console.log(`Sending POST to ${path}: ${xmlBody.trim()}`);
+
+            return fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/xml' },
+                body: xmlBody,
+                signal: AbortSignal.timeout(API_TIMEOUT)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`? Succes: ${actionText}`);
+                    setTimeout(updateHDMIInUIStatus, 1500); 
+                    return true;
+                } else {
+                    response.text().then(text => {
+                        logError(`Actie "${actionText}" mislukt. Status: ${response.status} ${response.statusText}. Antwoord: ${text}`);
+                    });
+                    return false;
+                }
+            })
+            .catch(error => {
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Time-out bij het uitvoeren van de actie.';
+                }
+                logError(`Fout bij verbinding/netwerk voor "${actionText}": ${errorMessage}`);
+                return false;
+            });
+        }
+
+        /** Schakelt de HDMI IN status (AAN/UIT). */
+        function toggleHDMIStatus() {
+            if (isHdmiInActive) {
+                const xmlBody = `<ContentItem source="PRODUCT" sourceAccount="TV"/>`;
+                sendPostRequest('/select', xmlBody, 'Schakel over naar TV-bron (UIT)');
+            } else {
+                const xmlBody = `<ContentItem source="PRODUCT" sourceAccount="HDMI_1"/>`;
+                sendPostRequest('/select', xmlBody, 'TV/HDMI IN AAN (Selecteren)');
+            }
+        }
+
+        /** Stuurt de audiovertraging naar de soundbar. */
+        function setDelay(delayValue) {
+            if (!isHdmiInActive) {
+                logError("Kan vertraging niet instellen: HDMI IN is niet actief.");
+                return;
+            }
+            const xmlBody = `<audiodspcontrols videosyncaudiodelay="${delayValue}"/>`;
+            sendPostRequest('/audiodspcontrols', xmlBody, `Vertraging instellen op ${delayValue}ms`);
+        }
+
+        /** Haalt de HDMI IN bronstatus en de huidige delay op. */
+        async function updateHDMIInUIStatus() {
+            clearError();
+            if (!hdmiInUi.toggleButton || !ST300_IP) return; 
+
+            hdmiInUi.toggleButton.disabled = true;
+            
+            try {
+                const parser = new DOMParser();
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+                // 1. Controleer de huidige bron via /now_playing
+                const npResponse = await fetch(`http://${ST300_IP}:${API_PORT}/now_playing`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                const npText = await npResponse.text();
+                const npXml = parser.parseFromString(npText, "application/xml");
+
+                const nowPlayingElement = npXml.querySelector('nowPlaying');
+                
+                const isReady = nowPlayingElement 
+                                && nowPlayingElement.getAttribute('source') === 'PRODUCT'
+                                && nowPlayingElement.getAttribute('sourceAccount') === 'HDMI_1';
+                
+                isHdmiInActive = isReady;
+
+                // 2. Huidige vertraging ophalen (/audiodspcontrols)
+                let currentDelay = 0;
+                const dspResponse = await fetch(`http://${ST300_IP}:${API_PORT}/audiodspcontrols`);
+                const dspText = await dspResponse.text();
+                const dspXml = parser.parseFromString(dspText, "application/xml");
+                
+                const dspControl = dspXml.querySelector('audiodspcontrols');
+                if (dspControl) {
+                    const delayAttr = dspControl.getAttribute('videosyncaudiodelay');
+                    if (delayAttr !== null) {
+                        currentDelay = parseInt(delayAttr, 10);
+                    }
+                }
+
+                // 3. UI bijwerken
+                updateToggleUI(isReady);
+                updateSliderUI(isReady, currentDelay);
+
+            } catch (error) {
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Time-out bij het ophalen van de status.';
+                }
+                logError(`Fout bij het ophalen van de status: ${errorMessage}. Controleer of de SoundTouch aan staat.`);
+                updateToggleUI(false, true); // Zet UI op foutmodus
+            } finally {
+                hdmiInUi.toggleButton.disabled = false;
+            }
+        }
+        
+        /** Past de uitstraling van de aan/uit-knop aan. */
+        function updateToggleUI(isActive, isError = false) {
+            
+            hdmiInUi.toggleButton.classList.remove('active-on', 'bg-gray-400', 'cursor-not-allowed');
+
+            if (isError) {
+                hdmiInUi.toggleButton.textContent = "Kan niet schakelen";
+                hdmiInUi.toggleButton.disabled = true;
+                hdmiInUi.toggleButton.style.backgroundColor = '#ccc'; // Grijze knop bij fout
+                return;
+            }
+            
+            if (isActive) {
+                hdmiInUi.toggleButton.textContent = "Zet HDMI-IN UIT";
+                hdmiInUi.toggleButton.classList.add('active-on');
+                hdmiInUi.toggleButton.style.backgroundColor = ''; 
+            } else {
+                hdmiInUi.toggleButton.textContent = "Zet HDMI-IN AAN";
+                hdmiInUi.toggleButton.style.backgroundColor = ''; 
+            }
+        }
+        
+        /** Past de uitstraling van de slider aan en stelt de waarde in. */
+        function updateSliderUI(isActive, currentDelay) {
+            hdmiInUi.delaySlider.value = currentDelay;
+            hdmiInUi.delayDisplay.textContent = currentDelay;
+
+            if (isActive) {
+                hdmiInUi.delaySlider.disabled = false;
+                hdmiInUi.sliderStatus.style.display = 'none'; 
+                hdmiInUi.sliderLabel.style.color = '#333';
+                hdmiInUi.delaySlider.style.opacity = '1';
+                hdmiInUi.delayDisplay.style.color = '#f44336';
+            } else {
+                hdmiInUi.delaySlider.disabled = true;
+                hdmiInUi.sliderStatus.style.display = 'none'; 
+                hdmiInUi.sliderLabel.style.color = '#999';
+                hdmiInUi.delaySlider.style.opacity = '0.5';
+                hdmiInUi.delayDisplay.style.color = '#999';
+            }
+        }
+        
+        /** Bijwerken van de display-waarde terwijl de gebruiker schuift. */
+        function updateDelayDisplay(value) {
+            if (hdmiInUi.delayDisplay) {
+                hdmiInUi.delayDisplay.textContent = value;
+            }
+        }
+
+
+        // --- EINDE NIEUWE HDMI IN FUNCTIES ---
+
+        
+        // --- API Functies: BAS (ST10/20) (ongewijzigd) ---
+        // ... (getBass en setBass blijven ongewijzigd) ...
+
+        async function getBass(ip) {
+            const url = `http://${ip}:8090/bass`; 
+            const room = getRoomByIp(ip);
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const bassNode = xmlDoc.getElementsByTagName("actualbass")[0]; 
+                if (bassNode && bassNode.textContent) {
+                    const bassLevel = parseInt(bassNode.textContent, 10);
+                    updateFeedback(feedbackElement, `Laatste status opgehaald`, 'success'); 
+                    return bassLevel;
+                } else {
+                    throw new Error("Geen of lege 'actualbass' tag gevonden.");
+                }
+            } catch (error) {
+                console.error(`[API ERROR in getBass] Fout bij ophalen bas voor ${ip}:`, error);
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen status', 'error');
+                } else if (error.message.includes('404')) {
+                    updateFeedback(feedbackElement, 'Online (Geen basregeling)', 'default'); 
+                } else {
+                    updateFeedback(feedbackElement, `Fout bij ophalen status: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        async function setBass(ip, level) {
+            const url = `http://${ip}:8090/bass`; 
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            const xmlBody = `<bass>${level}</bass>`;
+            
+            updateFeedback(feedbackElement, `Bas instellen op ${level}...`, 'loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `Bas succesvol ingesteld op ${level}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`[API ERROR in setBass] Fout bij instellen bas voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen bas: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+        
+        // --- API Functies: WLA Sync (Output Latency) (ongewijzigd) ---
+        // ... (getWLADelay en setWLADelay blijven ongewijzigd) ...
+
+        async function getWLADelay(ip) {
+            const url = `http://${ip}:8090${WLA_SYNC_ENDPOINT}`; 
+            const room = getRoomByIp(ip);
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+            const slider = document.getElementById(`delayRange-${room}`);
+            const valueDisplay = document.getElementById(`delayValue-${room}`);
+
+            if (isDragging[`${room}-sync`]) return; 
+
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+                
+                const outputLatencyElement = xmlDoc.getElementsByTagName('OutputLatency')[0];
+
+                if (outputLatencyElement) {
+                    const currentValue = outputLatencyElement.getAttribute('value');
+                    
+                    if (slider && valueDisplay) {
+                        if (slider.value !== currentValue) {
+                            slider.value = currentValue;
+                        }
+                        valueDisplay.textContent = currentValue;
+                    }
+
+                    updateFeedback(feedbackElement, `Online (Vertraging: ${currentValue}ms)`, 'success');
+                    return parseInt(currentValue, 10);
+
+                } else {
+                    throw new Error('Kon <OutputLatency> tag niet vinden.');
+                }
+
+            } catch (error) {
+                console.error(`[API ERROR in getWLADelay] Fout bij ophalen delay voor ${ip}:`, error);
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen status', 'error');
+                } else {
+                    updateFeedback(feedbackElement, `Fout bij ophalen status: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        async function setWLADelay(ip, delayMs) {
+            const url = `http://${ip}:8090${WLA_SYNC_ENDPOINT}`; 
+            const room = getRoomByIp(ip);
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+            
+            const xmlPayload = `<OutputLatency value="${delayMs}"/>`;
+
+            updateFeedback(feedbackElement, `Vertraging instellen op ${delayMs} ms...`, 'loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlPayload,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    getWLADelay(ip); 
+                    updateFeedback(feedbackElement, `Vertraging succesvol ingesteld op ${delayMs} ms.`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`[API ERROR in setWLADelay] Fout bij instellen delay voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen delay: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+
+        // --- API Functies: ST300 Niveaus, Speakers, CEC (ongewijzigd) ---
+        // ... (getST300Levels, setST300Levels, getST300SpeakerStatus, setST300SpeakerStatus, 
+        // getHdmiCecMode, setHdmiCecMode blijven ongewijzigd) ...
+
+        async function getST300Levels(ip) {
+            const url = `http://${ip}:8090${ST300_LEVELS_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const centerNode = xmlDoc.querySelector('frontCenterSpeakerLevel');
+                const surroundNode = xmlDoc.querySelector('rearSurroundSpeakersLevel');
+
+                if (centerNode && surroundNode) {
+                    const centerLevelAPI = parseInt(centerNode.getAttribute('value'), 10) || 0;
+                    const surroundLevelAPI = parseInt(surroundNode.getAttribute('value'), 10) || 0;
+                    
+                    const centerLevelApp = Math.round(centerLevelAPI / 10);
+                    const surroundLevelApp = Math.round(surroundLevelAPI / 10);
+
+                    updateFeedback(feedbackElement, `Niveaus opgehaald.`, 'success');
+                    return { center: centerLevelApp, surround: surroundLevelApp };
+                } else {
+                    throw new Error("Midden/Surround tags niet gevonden in API antwoord.");
+                }
+
+            } catch (error) {
+                console.error(`[API ERROR in getST300Levels] Fout bij ophalen niveaus voor ${ip}:`, error);
+                if (error.name === 'AbortError') {
+                    updateFeedback(feedbackElement, 'Time-out bij ophalen niveaus', 'error');
+                } else if (!error.message.includes('404')) {
+                    updateFeedback(feedbackElement, `Fout bij ophalen niveaus: ${error.message.substring(0, 40)}`, 'error');
+                }
+                throw error;
+            }
+        }
+
+        async function setST300Levels(ip, centerLevelApp, surroundLevelApp) {
+            const url = `http://${ip}:8090${ST300_LEVELS_ENDPOINT}`;
+            const feedbackElement = document.getElementById(`feedback-${getRoomByIp(ip)}`);
+            
+            const centerLevelApi = centerLevelApp * 10;
+            const surroundLevelApi = surroundLevelApp * 10;
+
+            const xmlBody = 
+                `<audioproductlevelcontrols>
+                    <frontCenterSpeakerLevel value="${centerLevelApi}" />
+                    <rearSurroundSpeakersLevel value="${surroundLevelApi}" />
+                </audioproductlevelcontrols>`;
+
+            updateFeedback(feedbackElement, `Niveaus instellen...`, 'loading');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `Niveaus succesvol ingesteld op C:${centerLevelApp}, S:${surroundLevelApp}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`[API ERROR in setST300Levels] Fout bij instellen ST300 niveaus voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen niveaus: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+
+        // --- ST300 Luidspreker Aan/Uit (Sub/Rear) ---
+
+        async function getST300SpeakerStatus(ip) {
+            const url = `http://${ip}:8090${ST300_SPEAKER_ENDPOINT}`;
+            
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const text = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                const rearNode = xmlDoc.querySelector('rear');
+                const subNode = xmlDoc.querySelector('subwoofer01');
+
+                if (rearNode && subNode) {
+                    const rearStatus = rearNode.getAttribute('active') === 'true';
+                    const subStatus = subNode.getAttribute('active') === 'true';
+
+                    return { rear: rearStatus, subwoofer: subStatus };
+                } else {
+                    throw new Error("Luidspreker status tags niet gevonden in API antwoord.");
+                }
+
+            } catch (error) {
+                console.error(`[API ERROR in getST300SpeakerStatus] Fout bij ophalen luidsprekerstatus voor ${ip}:`, error);
+                throw error;
+            }
+        }
+
+        async function setST300SpeakerStatus(ip, type, status) {
+            const url = `http://${ip}:8090${ST300_SPEAKER_ENDPOINT}`;
+            const room = getRoomByIp(ip);
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+
+            updateFeedback(feedbackElement, `${type} instellen op ${status}...`, 'loading');
+            updateToggleButton(room, type, status);
+
+            let currentStatuses;
+            try {
+                currentStatuses = await getST300SpeakerStatus(ip);
+            } catch (e) {
+                currentStatuses = { rear: true, subwoofer: true };
+            }
+
+            const newRearStatus = type === 'rear' ? status : currentStatuses.rear.toString();
+            const newSubStatus = type === 'subwoofer' ? status : currentStatuses.subwoofer.toString();
+
+            const xmlBody = 
+                `<audiospeakerattributeandsetting>
+                    <rear active="${newRearStatus}" />
+                    <subwoofer01 active="${newSubStatus}" />
+                </audiospeakerattributeandsetting>`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/xml' },
+                    body: xmlBody,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+                
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `${type} succesvol ingesteld op ${status}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`[API ERROR in setST300SpeakerStatus] Fout bij instellen ${type} voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen ${type}: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+        
+        // --- HDMI-CEC Functies ---
+
+        async function getHdmiCecMode(ip, room) {
+            const selectElement = document.getElementById(`hdmiCecMode-${room}`);
+            const feedbackElement = document.getElementById(`feedback-cec-${room}`);
+            
+            if (!selectElement) return;
+            
+            const url = `http://${ip}:8090${ST300_CEC_ENDPOINT}`; 
+            
+            updateFeedback(feedbackElement, 'Laden CEC-status...', 'default');
+
+            try {
+                const response = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(API_TIMEOUT) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+                
+                const rootElement = xmlDoc.querySelector('productcechdmicontrol');
+
+                if (rootElement) {
+                    const currentMode = rootElement.getAttribute('cecmode');
+                    
+                    if (currentMode && CEC_MODE_MAPPING.hasOwnProperty(currentMode)) {
+                        selectElement.value = currentMode;
+                        updateFeedback(feedbackElement, '', 'success'); 
+                    } else {
+                         throw new Error(`Onbekende of ontbrekende CEC-modus in attribuut: ${currentMode}`);
+                    }
+                } else {
+                    throw new Error('Root-tag productcechdmicontrol niet gevonden in API response.');
+                }
+
+            } catch (error) {
+                const errorMessage = error.name === 'AbortError' 
+                    ? 'Time-out bij ophalen CEC-status'
+                    : error.message.includes('404')
+                    ? 'CEC-endpoint niet gevonden (404).'
+                    : `Fout bij ophalen CEC-status: ${error.message.substring(0, 40)}`;
+                    
+                console.error(`[API ERROR in getHdmiCecMode] ${errorMessage} voor ${ip}:`, error);
+                updateFeedback(feedbackElement, errorMessage, 'error');
+            }
+        }
+
+        async function setHdmiCecMode(selectElement) {
+            // Haal de IP op via de helper functie (gebruikt het room-attribuut)
+            const room = selectElement.dataset.room;
+            const ip = getSt300Ip(); // ST300_IP wordt al via getSt300Ip gehaald
+            
+            if (!ip) {
+                 console.error('ST300 IP niet gevonden voor CEC instelling.');
+                 return;
+            }
+            
+            const mode = selectElement.value;
+            const feedbackElement = document.getElementById(`feedback-cec-${room}`); 
+
+            updateFeedback(feedbackElement, `CEC instellen op ${mode}...`, 'loading');
+
+            const url = `http://${ip}:8090${ST300_CEC_ENDPOINT}`;
+            
+            const xmlPayload = 
+                `<productcechdmicontrol cecmode="${mode}" />`; 
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/xml',
+                    },
+                    body: xmlPayload,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `CEC ingesteld op ${CEC_MODE_MAPPING[mode].split('(')[0].trim()}.`, 'success');
+                    selectElement.value = mode; 
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                console.error(`[API ERROR in setHdmiCecMode] Fout bij instellen CEC voor ${ip}:`, error);
+                updateFeedback(feedbackElement, `Fout bij instellen CEC: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+
+
+        // --- NIEUWE KLOK FUNCTIES ---
+
+        function updateClockDisplay(enable, room) {
+            const display = document.getElementById(`status-display-${room}`);
+            const toggle = document.getElementById(`klokToggle-${room}`);
+
+            if (!display || !toggle) return;
+
+            display.textContent = enable ? 'AAN' : 'UIT';
+            display.style.color = enable ? '#4CAF50' : '#f44336';
+            toggle.checked = enable;
+        }
+
+        // Functie om de klokstatus op te halen (GET)
+        async function getClockStatus(ip, room) {
+            const API_URL_CLOCK = `http://${ip}:${API_PORT}/clockDisplay`;
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+
+            try {
+                const response = await fetch(API_URL_CLOCK, { signal: AbortSignal.timeout(API_TIMEOUT) });
+                
+                if (response.ok) {
+                    const xmlText = await response.text();
+                    
+                    // Zoek de waarde van 'userEnable' in de XML
+                    const match = xmlText.match(/userEnable="(true|false)"/);
+
+                    if (match && match[1]) {
+                        const isEnabled = match[1] === 'true';
+                        updateClockDisplay(isEnabled, room);
+                        updateFeedback(feedbackElement, `Laatste status opgehaald`, 'success');
+                    } else {
+                        throw new Error("Kon klokstatus niet parsen.");
+                    }
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                let errorMessage = 'Fout bij klokstatus: Netwerkfout.';
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Time-out bij klokstatus ophalen.';
+                } else if (error.message.includes('404')) {
+                    errorMessage = 'Online (Geen klokregeling).'; 
+                } else {
+                    errorMessage = `Fout bij klokstatus: ${error.message.substring(0, 40)}`;
+                }
+                updateFeedback(feedbackElement, errorMessage, 'error');
+                // Zorg ervoor dat de slider en status-text de foutstatus tonen (of uit)
+                document.getElementById(`klokToggle-${room}`).checked = false;
+                document.getElementById(`status-display-${room}`).textContent = 'FOUT';
+                document.getElementById(`status-display-${room}`).style.color = '#f44336';
+            }
+        }
+
+
+        // Functie om de klokstatus in te stellen (POST)
+        async function setClockStatus(ip, enable, room) {
+            const API_URL_CLOCK = `http://${ip}:${API_PORT}/clockDisplay`;
+            const feedbackElement = document.getElementById(`feedback-${room}`);
+            const toggle = document.getElementById(`klokToggle-${room}`);
+            
+            updateFeedback(feedbackElement, `Klok instellen op ${enable ? 'AAN' : 'UIT'}...`, 'loading');
+            
+            const clockEnabled = enable ? 'true' : 'false';
+            
+            const xmlPayload = `
+                <clockDisplay>
+                    <clockConfig 
+                        timezoneInfo="${CLOCK_FIXED_ATTRIBUTES.timezoneInfo}" 
+                        userEnable="${clockEnabled}" 
+                        timeFormat="${CLOCK_FIXED_ATTRIBUTES.timeFormat}" 
+                        userOffsetMinute="${CLOCK_FIXED_ATTRIBUTES.userOffsetMinute}" 
+                        brightnessLevel="${CLOCK_FIXED_ATTRIBUTES.brightnessLevel}" 
+                        userUtcTime="${CLOCK_FIXED_ATTRIBUTES.userUtcTime}"
+                    />
+                </clockDisplay>
+            `.trim();
+
+            try {
+                const response = await fetch(API_URL_CLOCK, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/xml',
+                    },
+                    body: xmlPayload,
+                    signal: AbortSignal.timeout(API_TIMEOUT)
+                });
+
+                if (response.ok) {
+                    updateFeedback(feedbackElement, `Klok succesvol ingesteld op ${enable ? 'AAN' : 'UIT'}.`, 'success');
+                    updateClockDisplay(enable, room); // Bevestig de visuele status
+                } else {
+                    // Bij fout: Zet de slider terug en toon een foutmelding
+                    toggle.checked = !enable;
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 50)}`);
+                }
+            } catch (error) {
+                // Bij Netwerk/CORS fout: Zet de slider terug en toon een foutmelding
+                toggle.checked = !enable;
+                updateFeedback(feedbackElement, `Fout bij instellen klok: ${error.message.substring(0, 40)}`, 'error');
+            }
+        }
+        // --- EINDE NIEUWE KLOK FUNCTIES ---
+
+        // --- Verversingslogica ---
+
+        async function updateBassSliderFromAPI(slider) {
+            const ip = slider.dataset.ip;
+            const room = slider.dataset.room;
+            const valueDisplay = document.getElementById(`bass-${room}-value`);
+            
+            if (isDragging[`${room}-bass`]) return; 
+            
+            try {
+                const currentBass = await getBass(ip);
+                if (slider.value !== currentBass.toString()) {
+                    slider.value = currentBass; 
+                    valueDisplay.textContent = currentBass;
+                }
+            } catch (e) {
+                // Foutafhandeling gebeurt in getBass
+            }
+        }
+
+        async function updateST300SlidersFromAPI(ip) {
+            const room = getRoomByIp(ip);
+            const centerSlider = document.getElementById(`level-${room}-center`);
+            const surroundSlider = document.getElementById(`level-${room}-surround`);
+            const centerValueDisplay = document.getElementById(`level-${room}-center-value`);
+            const surroundValueDisplay = document.getElementById(`level-${room}-surround-value`);
+
+            if (isDragging[`${room}-center`] || isDragging[`${room}-surround`]) return;
+            if (!centerSlider || !surroundSlider) return; // Beveiliging voor de ST300 sliders
+
+            try {
+                const levels = await getST300Levels(ip);
+                
+                if (centerSlider.value !== levels.center.toString()) {
+                    centerSlider.value = levels.center;
+                    centerValueDisplay.textContent = levels.center;
+                }
+                if (surroundSlider.value !== levels.surround.toString()) {
+                    surroundSlider.value = levels.surround;
+                    surroundValueDisplay.textContent = levels.surround;
+                }
+            } catch (e) {
+                // Foutafhandeling voor ST300 niveaus gebeurt in de get functie
+            }
+        }
+
+        async function updateST300SwitchesFromAPI(ip) {
+            const room = getRoomByIp(ip);
+            
+            // 1. Update Subwoofer/Rear
+            try {
+                const statuses = await getST300SpeakerStatus(ip);
+                updateToggleButton(room, 'subwoofer', statuses.subwoofer);
+                updateToggleButton(room, 'rear', statuses.rear);
+            } catch (e) {
+                // De fout wordt gelogd in de get-functie
+            }
+
+            // 2. Update CEC status
+            await getHdmiCecMode(ip, room);
+        }
+
+
+        function startAutoRefresh() {
+            
+            const fullRefresh = () => {
+                const st300Ip = getSt300Ip(); 
+                
+                SPEAKERS.forEach(speaker => { 
+                    const room = speaker.room;
+                    const ip = speaker.ip;
+
+                    // NIEUW: Klok controle voor de 4 ST20/ST10 speakers
+                    if (CLOCK_ROOMS.includes(room)) {
+                        getClockStatus(ip, room).catch(() => {});
+                    }
+                    
+                    if (speaker.hasSyncControl) { 
+                        // WLA sync controle
+                        getWLADelay(ip).catch(() => {});
+                    } else if (speaker.hasBassControl) { 
+                        // ST10/20 bass controle
+                        const slider = document.getElementById(`bass-${room}`);
+                        if (slider) {
+                            updateBassSliderFromAPI(slider);
+                        }
+                    }
+                });
+
+                if (st300Ip) {
+                    // Update bestaande ST300 controls
+                    updateST300SlidersFromAPI(st300Ip);
+                    updateST300SwitchesFromAPI(st300Ip);
+                    
+                    // NIEUW: Update HDMI IN status
+                    updateHDMIInUIStatus(); 
+                }
+            };
+
+            fullRefresh();
+            setInterval(fullRefresh, 2000); 
+        }
+
+        // --- Initialisatie ---
+        function initialize() {
+            const st300Ip = getSt300Ip();
+
+            // 1. Koppel de IP's aan alle relevante elementen die deze (nog) niet hebben
+            // Selecteert sliders (met data-room) en toggle-knoppen (zonder data-room)
+            const allElementsNeedingIP = document.querySelectorAll('[data-room], .on-off-toggle button'); 
+            
+            for (const element of allElementsNeedingIP) {
+                let room = element.dataset.room;
+                let ipFromConfig;
+
+                // FIX: Als het element geen data-room heeft, maar wel een ID die op een toggle lijkt, leid de kamer af.
+                if (!room && element.id && element.id.startsWith('toggle-')) {
+                    // Haalt 'Woonkamer' uit 'toggle-Woonkamer-subwoofer-on'
+                    room = element.id.split('-')[1]; 
+                }
+                
+                // Zoek het IP en ken het toe
+                if (room) {
+                    ipFromConfig = SPEAKERS.find(s => s.room === room)?.ip;
+                    
+                    if (ipFromConfig) {
+                        element.dataset.ip = ipFromConfig; // Nu hebben ook de toggle buttons en de nieuwe klok toggles een data-ip!
+                    }
+                }
+            }
+
+
+            // 2. Initialiseer HDMI IN UI elementen
+            hdmiInUi.toggleButton = document.getElementById('masterToggle');
+            hdmiInUi.delaySlider = document.getElementById('delaySlider');
+            hdmiInUi.delayDisplay = document.getElementById('delayValueDisplay');
+            hdmiInUi.sliderLabel = document.getElementById('sliderLabel');
+            hdmiInUi.sliderStatus = document.getElementById('sliderStatus');
+            hdmiInUi.errorLog = document.getElementById('errorLog-hdmi'); 
+
+            // Voeg event listeners toe voor de NIEUWE HDMI IN controls
+            if (hdmiInUi.toggleButton) hdmiInUi.toggleButton.addEventListener('click', toggleHDMIStatus);
+            if (hdmiInUi.delaySlider) {
+                hdmiInUi.delaySlider.addEventListener('input', (event) => updateDelayDisplay(event.target.value));
+                hdmiInUi.delaySlider.addEventListener('change', (event) => setDelay(event.target.value));
+            }
+            updateToggleUI(false); 
+            updateSliderUI(false, 0); 
+            
+            
+            // 3. Initialisatie voor ALLE andere sliders (Bass, Center, Surround, Sync)
+            const allSliders = document.querySelectorAll('input[type="range"][data-ip]');
+            for (const slider of allSliders) {
+                const room = slider.dataset.room;
+                const type = slider.dataset.type; 
+                const ip = slider.dataset.ip; // IP is nu via stap 1 ingesteld of al aanwezig
+                const key = `${room}-${type}`;
+
+                let valueDisplayId;
+                if (type === 'bass') valueDisplayId = `bass-${room}-value`;
+                else if (type === 'center' || type === 'surround') valueDisplayId = `level-${room}-${type}-value`;
+                else if (type === 'sync') valueDisplayId = `delayValue-${room}`;
+                
+                const valueDisplay = document.getElementById(valueDisplayId);
+
+                isDragging[key] = false;
+
+                slider.addEventListener('input', (event) => {
+                    isDragging[key] = true;
+                    if (valueDisplay) valueDisplay.textContent = event.target.value;
+                });
+
+                slider.addEventListener('change', (event) => {
+                    isDragging[key] = false;
+                    const newLevel = parseInt(event.target.value, 10);
+                    
+                    if (type === 'sync') {
+                        setWLADelay(ip, newLevel);
+                    } else if (type === 'bass') {
+                        setBass(ip, newLevel);
+                    } else if (room === 'Woonkamer' && (type === 'center' || type === 'surround')) {
+                        const centerSlider = document.getElementById(`level-${room}-center`);
+                        const surroundSlider = document.getElementById(`level-${room}-surround`);
+                        
+                        const currentCenter = parseInt(centerSlider.value, 10);
+                        const currentSurround = parseInt(surroundSlider.value, 10);
+
+                        const newCenter = (type === 'center') ? newLevel : currentCenter;
+                        const newSurround = (type === 'surround') ? newLevel : currentSurround;
+
+                        setST300Levels(ip, newCenter, newSurround);
+                    }
+                });
+                
+                const feedbackElement = document.getElementById(`feedback-${room}`);
+                updateFeedback(feedbackElement, 'Laden...', 'default');
+            }
+
+            // 4. Initialisatie voor toggle knoppen (Sub/Rear)
+            const allToggleButtons = document.querySelectorAll('.on-off-toggle button'); 
+            for (const button of allToggleButtons) {
+                // Deze check is nu succesvol voor Woonkamer knoppen door de fix in stap 1
+                if (!button.dataset.ip) continue; 
+
+                button.addEventListener('click', (event) => {
+                    const ip = event.target.dataset.ip;
+                    const type = event.target.dataset.type; // 'subwoofer' of 'rear'
+                    const status = event.target.dataset.status; // 'true' of 'false'
+
+                    setST300SpeakerStatus(ip, type, status);
+                });
+            }
+            
+            // 5. Start de periodieke verversing
+            startAutoRefresh();
+        }
+
+        window.addEventListener('load', initialize);
+    </script>
+
+</body>
+</html>
